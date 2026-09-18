@@ -11,6 +11,7 @@ Sistema de Vigilancia en Salud Pública (SIVIGILA), con:
     original, aquí el formulario se genera solo)
   - Módulo de Laboratorios ligado a cada ficha
   - Listado/búsqueda de fichas y pequeño panel de indicadores xxx
+  - cambio desde el pc de Javierr
 
 Ejecutar con:  python app.py
 Requisitos:    pip install -r requirements.txt xxxxxx
