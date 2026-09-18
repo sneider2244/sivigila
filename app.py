@@ -10,10 +10,10 @@ Sistema de Vigilancia en Salud Pública (SIVIGILA), con:
     DINÁMICOS según el evento seleccionado (a diferencia del software
     original, aquí el formulario se genera solo)
   - Módulo de Laboratorios ligado a cada ficha
-  - Listado/búsqueda de fichas y pequeño panel de indicadores
+  - Listado/búsqueda de fichas y pequeño panel de indicadores xxx
 
 Ejecutar con:  python app.py
-Requisitos:    pip install -r requirements.txt
+Requisitos:    pip install -r requirements.txt xxxxxx
 """
 
 import json
