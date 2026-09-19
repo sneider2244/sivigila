@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs y temporales
+*.log
+*.tmp
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
