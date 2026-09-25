@@ -313,3 +313,48 @@ async def test_progreso_asignacion_ajena_403(client: AsyncClient) -> None:
         headers=_auth(muni_token),
     )
     assert resp.status_code == 403
+
+
+async def test_get_escenario_estudiante_ok(client: AsyncClient) -> None:
+    docente_token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(
+        client, docente_token, titulo="Caso visible", descripcion="Descripción del caso"
+    )
+
+    muni_id = (await _login_response(client, MUNI_USERNAME, MUNI_PASSWORD))["usuario"]["id"]
+    asignaciones = await _asignar(client, docente_token, esc["id"], [muni_id])
+    asignacion_id = asignaciones[0]["id"]
+
+    muni_token = await _login(client, MUNI_USERNAME, MUNI_PASSWORD)
+    resp = await client.get(
+        f"/api/v1/estudiante/escenarios/{asignacion_id}", headers=_auth(muni_token)
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["id"] == asignacion_id
+    assert data["escenario"]["titulo"] == "Caso visible"
+    assert data["escenario"]["descripcion"] == "Descripción del caso"
+    assert "datos_esperados" not in data["escenario"]
+
+
+async def test_get_escenario_estudiante_ajeno_403(client: AsyncClient) -> None:
+    docente_token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, docente_token, titulo="Ajeno get FP3")
+
+    ajeno_id = (await _login_response(client, AJENO_USERNAME, AJENO_PASSWORD))["usuario"]["id"]
+    asignaciones = await _asignar(client, docente_token, esc["id"], [ajeno_id])
+    asignacion_id = asignaciones[0]["id"]
+
+    muni_token = await _login(client, MUNI_USERNAME, MUNI_PASSWORD)
+    resp = await client.get(
+        f"/api/v1/estudiante/escenarios/{asignacion_id}", headers=_auth(muni_token)
+    )
+    assert resp.status_code == 403
+
+
+async def test_get_escenario_estudiante_inexistente_404(client: AsyncClient) -> None:
+    token = await _login(client, MUNI_USERNAME, MUNI_PASSWORD)
+    resp = await client.get(
+        f"/api/v1/estudiante/escenarios/{ASIGNACION_INEXISTENTE_ID}", headers=_auth(token)
+    )
+    assert resp.status_code == 404

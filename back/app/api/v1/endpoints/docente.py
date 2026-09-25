@@ -317,6 +317,37 @@ async def listar_escenarios_estudiante(
     ]
 
 
+@router.get("/estudiante/escenarios/{asignacion_id}", response_model=EstudianteAsignacionOut)
+async def obtener_escenario_estudiante(
+    asignacion_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> EstudianteAsignacionOut:
+    """Obtiene una asignación propia con su escenario (sin `datos_esperados`).
+
+    404 si no existe; 403 si pertenece a otro estudiante.
+    """
+    asignacion = await db.get(EscenarioAsignacion, asignacion_id)
+    if asignacion is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_ASIGNACION_NO_ENCONTRADA,
+        )
+    if asignacion.estudiante_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=_DETALLE_ENTREGA_SIN_PERMISO,
+        )
+
+    escenario = await db.get(EscenarioClinico, asignacion.escenario_id)
+    return EstudianteAsignacionOut(
+        id=asignacion.id,
+        estado=asignacion.estado,
+        ficha_basica_id=asignacion.ficha_basica_id,
+        escenario=EscenarioEstudianteOut.model_validate(escenario),
+    )
+
+
 async def _marcar_asignacion(
     db: AsyncSession,
     asignacion_id: int,
