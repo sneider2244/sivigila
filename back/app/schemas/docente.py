@@ -6,9 +6,10 @@ del resultado de la evaluación automatizada de fichas diligenciadas.
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.docente import EstadoAsignacion
+from app.models.usuario import RolEnum
 
 
 class EscenarioCreate(BaseModel):
@@ -38,11 +39,18 @@ class EscenarioOut(BaseModel):
 
 
 class AsignacionCreate(BaseModel):
-    """Payload para asignar un escenario a un estudiante."""
+    """Payload para asignar un escenario a múltiples estudiantes (bulk)."""
 
     model_config = ConfigDict(extra="forbid")
 
-    estudiante_id: int
+    estudiante_ids: list[int]
+
+    @field_validator("estudiante_ids")
+    @classmethod
+    def _no_vacia(cls, value: list[int]) -> list[int]:
+        if not value:
+            raise ValueError("estudiante_ids no puede estar vacía")
+        return value
 
 
 class AsignacionOut(BaseModel):
@@ -56,6 +64,19 @@ class AsignacionOut(BaseModel):
     estudiante_nombre: str
     estado: EstadoAsignacion
     ficha_basica_id: int | None
+
+
+class EstudianteOut(BaseModel):
+    """Representación de un estudiante para el listado del docente."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    nombre_completo: str
+    rol: RolEnum
+    numero_identificacion: str | None
+    activo: bool
 
 
 class EvaluarRequest(BaseModel):

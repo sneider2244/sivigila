@@ -195,18 +195,21 @@ async def test_asignar_201(client: AsyncClient) -> None:
 
     resp = await client.post(
         f"/api/v1/docente/escenarios/{esc['id']}/asignar",
-        json={"estudiante_id": estudiante_id},
+        json={"estudiante_ids": [estudiante_id]},
         headers=_auth(token),
     )
     assert resp.status_code == 201
     data = resp.json()
-    assert data["estado"] == "ASIGNADO"
-    assert data["escenario_id"] == esc["id"]
-    assert data["estudiante_id"] == estudiante_id
-    assert data["escenario_titulo"] == "Escenario asignable"
-    assert data["estudiante_username"] == ESTUDIANTE_USERNAME
-    assert data["estudiante_nombre"] == "Estudiante Test"
-    assert data["ficha_basica_id"] is None
+    assert isinstance(data, list)
+    assert len(data) == 1
+    asignacion = data[0]
+    assert asignacion["estado"] == "ASIGNADO"
+    assert asignacion["escenario_id"] == esc["id"]
+    assert asignacion["estudiante_id"] == estudiante_id
+    assert asignacion["escenario_titulo"] == "Escenario asignable"
+    assert asignacion["estudiante_username"] == ESTUDIANTE_USERNAME
+    assert asignacion["estudiante_nombre"] == "Estudiante Test"
+    assert asignacion["ficha_basica_id"] is None
 
 
 async def test_estudiante_lista_escenarios_200(client: AsyncClient) -> None:
@@ -218,7 +221,7 @@ async def test_estudiante_lista_escenarios_200(client: AsyncClient) -> None:
 
     resp = await client.post(
         f"/api/v1/docente/escenarios/{esc['id']}/asignar",
-        json={"estudiante_id": estudiante_id},
+        json={"estudiante_ids": [estudiante_id]},
         headers=_auth(token),
     )
     assert resp.status_code == 201

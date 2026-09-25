@@ -13,7 +13,7 @@ Flujo:
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -28,6 +28,7 @@ from app.schemas.docente import (
     AsignacionOut,
     EscenarioCreate,
     EscenarioOut,
+    EstudianteOut,
     EvaluacionDetalle,
     EvaluacionResult,
     EvaluarRequest,
@@ -39,7 +40,6 @@ _docente_dependency = require_roles(RolEnum.DOCENTE)
 
 _DETALLE_ESCENARIO_NO_ENCONTRADO = "Escenario clínico no encontrado"
 _DETALLE_FICHA_NO_ENCONTRADA = "Ficha de datos básicos no encontrada"
-_DETALLE_ESTUDIANTE_NO_ENCONTRADO = "Estudiante no encontrado"
 
 # Campos planos de `fichas_datos_basicos` que participan en la evaluación.
 _CAMPOS_PLANOS = (
@@ -87,18 +87,43 @@ async def listar_escenarios(
     return list(await db.scalars(stmt))
 
 
+@router.get("/docente/estudiantes", response_model=list[EstudianteOut])
+async def listar_estudiantes(
+    q: str | None = None,
+    current_user: Usuario = Depends(_docente_dependency),
+    db: AsyncSession = Depends(get_db),
+) -> list[Usuario]:
+    """Lista usuarios no-DOCENTE (solo DOCENTE) con búsqueda opcional `q`."""
+    stmt = select(Usuario).where(Usuario.rol != RolEnum.DOCENTE)
+    if q:
+        pattern = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                Usuario.nombre_completo.ilike(pattern),
+                Usuario.username.ilike(pattern),
+                Usuario.numero_identificacion.ilike(pattern),
+            )
+        )
+    stmt = stmt.order_by(Usuario.nombre_completo)
+    return list(await db.scalars(stmt))
+
+
 @router.post(
     "/docente/escenarios/{escenario_id}/asignar",
-    response_model=AsignacionOut,
+    response_model=list[AsignacionOut],
     status_code=status.HTTP_201_CREATED,
 )
-async def asignar_escenario(
+async def asignar_escenarios(
     escenario_id: int,
     payload: AsignacionCreate,
     current_user: Usuario = Depends(_docente_dependency),
     db: AsyncSession = Depends(get_db),
-) -> AsignacionOut:
-    """Asigna un escenario a un estudiante (solo DOCENTE)."""
+) -> list[AsignacionOut]:
+    """Asigna un escenario a varios estudiantes (bulk, idempotente; solo DOCENTE).
+
+    Salta los pares `(escenario_id, estudiante_id)` ya existentes y crea solo los
+    nuevos en estado `ASIGNADO`. Devuelve únicamente las asignaciones creadas.
+    """
     escenario = await db.get(EscenarioClinico, escenario_id)
     if escenario is None:
         raise HTTPException(
@@ -106,32 +131,55 @@ async def asignar_escenario(
             detail=_DETALLE_ESCENARIO_NO_ENCONTRADO,
         )
 
-    estudiante = await db.get(Usuario, payload.estudiante_id)
-    if estudiante is None:
+    estudiante_ids = list(dict.fromkeys(payload.estudiante_ids))
+
+    estudiantes = await db.scalars(
+        select(Usuario).where(Usuario.id.in_(estudiante_ids))
+    )
+    por_id = {estudiante.id: estudiante for estudiante in estudiantes}
+    inexistentes = [uid for uid in estudiante_ids if uid not in por_id]
+    if inexistentes:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=_DETALLE_ESTUDIANTE_NO_ENCONTRADO,
+            detail=f"Estudiante(s) no encontrado(s): {inexistentes}",
         )
 
-    asignacion = EscenarioAsignacion(
-        escenario_id=escenario_id,
-        estudiante_id=payload.estudiante_id,
-        estado=EstadoAsignacion.ASIGNADO,
+    ya_asignados = set(
+        await db.scalars(
+            select(EscenarioAsignacion.estudiante_id).where(
+                EscenarioAsignacion.escenario_id == escenario_id,
+                EscenarioAsignacion.estudiante_id.in_(estudiante_ids),
+            )
+        )
     )
-    db.add(asignacion)
-    await db.commit()
-    await db.refresh(asignacion)
 
-    return AsignacionOut(
-        id=asignacion.id,
-        escenario_id=escenario.id,
-        escenario_titulo=escenario.titulo,
-        estudiante_id=estudiante.id,
-        estudiante_username=estudiante.username,
-        estudiante_nombre=estudiante.nombre_completo,
-        estado=asignacion.estado,
-        ficha_basica_id=asignacion.ficha_basica_id,
-    )
+    creadas: list[AsignacionOut] = []
+    for estudiante_id in estudiante_ids:
+        if estudiante_id in ya_asignados:
+            continue
+        estudiante = por_id[estudiante_id]
+        asignacion = EscenarioAsignacion(
+            escenario_id=escenario_id,
+            estudiante_id=estudiante_id,
+            estado=EstadoAsignacion.ASIGNADO,
+        )
+        db.add(asignacion)
+        await db.flush()
+        creadas.append(
+            AsignacionOut(
+                id=asignacion.id,
+                escenario_id=escenario.id,
+                escenario_titulo=escenario.titulo,
+                estudiante_id=estudiante.id,
+                estudiante_username=estudiante.username,
+                estudiante_nombre=estudiante.nombre_completo,
+                estado=asignacion.estado,
+                ficha_basica_id=asignacion.ficha_basica_id,
+            )
+        )
+
+    await db.commit()
+    return creadas
 
 
 @router.get("/docente/asignaciones", response_model=list[AsignacionOut])

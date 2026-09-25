@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import enum
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -57,6 +57,13 @@ class EscenarioAsignacion(Base):
     """Asignación de un escenario clínico a un estudiante."""
 
     __tablename__ = "escenario_asignaciones"
+    __table_args__ = (
+        UniqueConstraint(
+            "escenario_id",
+            "estudiante_id",
+            name="uq_escenario_asignaciones_escenario_estudiante",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     escenario_id: Mapped[int] = mapped_column(
