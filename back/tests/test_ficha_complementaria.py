@@ -184,18 +184,21 @@ async def test_crear_ofidico_valido_201(client: AsyncClient) -> None:
     assert data["contenido"]["atencion_hospitalaria"]["dosis"] is None
 
 
-async def test_crear_ofidico_invalido_422(client: AsyncClient) -> None:
+async def test_contenido_generico_aceptado_201(client: AsyncClient) -> None:
     token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
     ficha_id = await _crear_ficha_basica(client, token, UPGD_OWN_COD, "1023456701")
 
-    contenido = _contenido_ofidico_valido()
-    contenido["manifestaciones_locales"]["edema"] = "no-soy-bool"
+    # El contenido ya no se valida por evento: se acepta cualquier dict.
     resp = await client.post(
         "/api/v1/fichas/datos-complementarios",
-        json=_payload_complementaria(ficha_id, contenido=contenido),
+        json={
+            "ficha_basica_id": ficha_id,
+            "cod_evento": "100",
+            "contenido": {"observacion": "forma libre", "n": 1},
+        },
         headers=_auth(token),
     )
-    assert resp.status_code == 422
+    assert resp.status_code == 201, resp.text
 
 
 async def test_ficha_basica_inexistente_404(client: AsyncClient) -> None:
@@ -208,7 +211,8 @@ async def test_ficha_basica_inexistente_404(client: AsyncClient) -> None:
     assert resp.status_code == 404
 
 
-async def test_upgd_ficha_ajena_403(client: AsyncClient) -> None:
+async def test_any_rol_puede_crear_complementaria_201(client: AsyncClient) -> None:
+    # RBAC desacoplado (R20): cualquier rol autenticado puede crear, sin scoping.
     token_docente = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
     ajena_id = await _crear_ficha_basica(client, token_docente, UPGD_OTRO_COD, "1023456702")
 
@@ -218,7 +222,7 @@ async def test_upgd_ficha_ajena_403(client: AsyncClient) -> None:
         json=_payload_complementaria(ajena_id),
         headers=_auth(token_upgd),
     )
-    assert resp.status_code == 403
+    assert resp.status_code == 201, resp.text
 
 
 async def test_upgd_ficha_propia_201(client: AsyncClient) -> None:
