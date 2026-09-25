@@ -56,12 +56,14 @@ class FichaDatosBasicosBase(BaseModel):
 class FichaDatosBasicosCreate(FichaDatosBasicosBase):
     """Payload de creación.
 
-    `cod_upgd` es requerido en el payload (el frontend siempre lo envía). Para un
-    usuario UPGD el backend descarta el valor recibido e impone su propia UPGD
-    (`current_user.cod_upgd`); para DOCENTE se respeta el valor enviado.
+    `cod_upgd` es opcional (FP3). El backend resuelve el valor final así:
+    `current_user.cod_upgd` -> `payload.cod_upgd` -> UPGD demo
+    (`"150010123456"`). Para un usuario UPGD el backend descarta el valor
+    recibido e impone su propia UPGD; un usuario sin UPGD que no envíe el campo
+    obtiene la UPGD demo (sin 400).
     """
 
-    cod_upgd: str = Field(min_length=1, max_length=20)
+    cod_upgd: str | None = Field(default=None, min_length=1, max_length=20)
 
 
 class FichaDatosBasicosUpdate(BaseModel):

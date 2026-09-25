@@ -229,7 +229,7 @@ async def test_estudiante_lista_escenarios_200(client: AsyncClient) -> None:
     resp = await client.get("/api/v1/estudiante/escenarios", headers=_auth(est_token))
     assert resp.status_code == 200
     data = resp.json()
-    assert any(e["id"] == esc["id"] for e in data)
+    assert any(e["escenario"]["id"] == esc["id"] for e in data)
 
 
 async def test_evaluar_200_con_puntaje(client: AsyncClient) -> None:

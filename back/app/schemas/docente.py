@@ -79,6 +79,34 @@ class EstudianteOut(BaseModel):
     activo: bool
 
 
+class EscenarioEstudianteOut(BaseModel):
+    """Vista de un escenario para el estudiante (sin `datos_esperados` — no-leak)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    titulo: str
+    descripcion: str
+    cod_evento: str
+
+
+class EstudianteAsignacionOut(BaseModel):
+    """Asignación vista por el estudiante: estado + escenario sin `datos_esperados`."""
+
+    id: int
+    estado: EstadoAsignacion
+    ficha_basica_id: int | None
+    escenario: EscenarioEstudianteOut
+
+
+class EntregaRequest(BaseModel):
+    """Payload de entrega de una ficha para una asignación (estudiante)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    ficha_basica_id: int
+
+
 class EvaluarRequest(BaseModel):
     """Payload de evaluación automatizada de una ficha contra un escenario."""
 

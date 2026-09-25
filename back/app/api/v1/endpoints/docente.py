@@ -26,8 +26,11 @@ from app.models.usuario import RolEnum, Usuario
 from app.schemas.docente import (
     AsignacionCreate,
     AsignacionOut,
+    EntregaRequest,
     EscenarioCreate,
+    EscenarioEstudianteOut,
     EscenarioOut,
+    EstudianteAsignacionOut,
     EstudianteOut,
     EvaluacionDetalle,
     EvaluacionResult,
@@ -40,6 +43,10 @@ _docente_dependency = require_roles(RolEnum.DOCENTE)
 
 _DETALLE_ESCENARIO_NO_ENCONTRADO = "Escenario clínico no encontrado"
 _DETALLE_FICHA_NO_ENCONTRADA = "Ficha de datos básicos no encontrada"
+_DETALLE_ASIGNACION_NO_ENCONTRADA = "Asignación de escenario no encontrada"
+_DETALLE_ENTREGA_SIN_PERMISO = (
+    "No posee los permisos necesarios para realizar esta operación en SIVIGILA."
+)
 
 # Campos planos de `fichas_datos_basicos` que participan en la evaluación.
 _CAMPOS_PLANOS = (
@@ -215,19 +222,80 @@ async def listar_asignaciones(
     ]
 
 
-@router.get("/estudiante/escenarios", response_model=list[EscenarioOut])
+@router.get("/estudiante/escenarios", response_model=list[EstudianteAsignacionOut])
 async def listar_escenarios_estudiante(
     current_user: Usuario = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> list[EscenarioClinico]:
-    """Lista los escenarios asignados al usuario autenticado (cualquier rol)."""
+) -> list[EstudianteAsignacionOut]:
+    """Lista las asignaciones del usuario autenticado (cualquier rol).
+
+    Devuelve la vista sin `datos_esperados` (no-leak): cada asignación incluye el
+    escenario anidado con `id`, `titulo`, `descripcion` y `cod_evento`.
+    """
     stmt = (
-        select(EscenarioClinico)
-        .join(EscenarioAsignacion, EscenarioAsignacion.escenario_id == EscenarioClinico.id)
+        select(EscenarioAsignacion, EscenarioClinico)
+        .join(EscenarioClinico, EscenarioClinico.id == EscenarioAsignacion.escenario_id)
         .where(EscenarioAsignacion.estudiante_id == current_user.id)
-        .order_by(EscenarioClinico.id)
+        .order_by(EscenarioAsignacion.id)
     )
-    return list(await db.scalars(stmt))
+    rows = (await db.execute(stmt)).all()
+    return [
+        EstudianteAsignacionOut(
+            id=asignacion.id,
+            estado=asignacion.estado,
+            ficha_basica_id=asignacion.ficha_basica_id,
+            escenario=EscenarioEstudianteOut.model_validate(escenario),
+        )
+        for asignacion, escenario in rows
+    ]
+
+
+@router.post(
+    "/estudiante/escenarios/{asignacion_id}/entregar",
+    response_model=EstudianteAsignacionOut,
+)
+async def entregar_escenario(
+    asignacion_id: int,
+    payload: EntregaRequest,
+    current_user: Usuario = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> EstudianteAsignacionOut:
+    """Entrega la ficha de una asignación propia y la marca como COMPLETADO.
+
+    404 si la asignación o la ficha no existen; 403 si la asignación pertenece a
+    otro estudiante.
+    """
+    asignacion = await db.get(EscenarioAsignacion, asignacion_id)
+    if asignacion is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_ASIGNACION_NO_ENCONTRADA,
+        )
+    if asignacion.estudiante_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=_DETALLE_ENTREGA_SIN_PERMISO,
+        )
+
+    ficha = await db.get(FichaDatosBasicos, payload.ficha_basica_id)
+    if ficha is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_FICHA_NO_ENCONTRADA,
+        )
+
+    asignacion.ficha_basica_id = payload.ficha_basica_id
+    asignacion.estado = EstadoAsignacion.COMPLETADO
+    await db.commit()
+    await db.refresh(asignacion)
+
+    escenario = await db.get(EscenarioClinico, asignacion.escenario_id)
+    return EstudianteAsignacionOut(
+        id=asignacion.id,
+        estado=asignacion.estado,
+        ficha_basica_id=asignacion.ficha_basica_id,
+        escenario=EscenarioEstudianteOut.model_validate(escenario),
+    )
 
 
 @router.post("/docente/evaluar", response_model=EvaluacionResult)

@@ -1,12 +1,13 @@
 """Endpoints CRUD de la ficha de datos básicos (Task B5).
 
-RBAC (matriz del contrato):
+RBAC (matriz del contrato, desacoplado en FP3):
 - Autenticación obligatoria en todos los endpoints (get_current_user).
+- Creación (`POST /datos-basicos`): CUALQUIER rol autenticado (enfoque
+  aprendizaje; el rol es etiqueta, no candado). `cod_upgd` se resuelve así:
+  `current_user.cod_upgd` -> `payload.cod_upgd` -> default demo.
 - UPGD: `cod_upgd` se fuerza a su propia UPGD (no puede forjar ajenas); solo
   ve/edita sus propias fichas (listado filtrado; ficha ajena -> 403).
 - MUNICIPAL, DEPARTAMENTAL, NACIONAL, DOCENTE: lectura de todo.
-- DOCENTE: además puede crear fichas (para cualquier UPGD).
-- UI: sin acceso a este módulo (403).
 - Sin PUT/edición en este alcance (Sprint 3, con ajustes).
 """
 
@@ -33,7 +34,7 @@ _ROLES_LECTURA = (
     RolEnum.DOCENTE,
 )
 
-_ROLES_ESCRITURA = (RolEnum.UPGD, RolEnum.DOCENTE)
+_COD_UPGD_DEMO = "150010123456"
 
 # Roles que pueden revisar y cambiar el estado de una ficha (Task B7).
 # UPGD y UI quedan fuera (403).
@@ -48,7 +49,6 @@ _DETALLE_NO_ENCONTRADA = "Ficha de datos básicos no encontrada"
 _DETALLE_SIN_PERMISO = "No posee los permisos necesarios para realizar esta operación en SIVIGILA."
 
 _lectura_dependency = require_roles(*_ROLES_LECTURA)
-_escritura_dependency = require_roles(*_ROLES_ESCRITURA)
 _estado_dependency = require_roles(*_ROLES_ESTADO)
 
 # Máquina de estados del ciclo de vida (Task B7). Documentada en B7-report.md.
@@ -80,18 +80,16 @@ def _asegurar_ficha_propia(usuario: Usuario, cod_upgd: str) -> None:
 )
 async def crear_ficha_basica(
     payload: FichaDatosBasicosCreate,
-    current_user: Usuario = Depends(_escritura_dependency),
+    current_user: Usuario = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> FichaDatosBasicos:
-    """Crea una notificación individual de datos básicos."""
-    cod_upgd = payload.cod_upgd
-    if current_user.rol == RolEnum.UPGD:
-        cod_upgd = current_user.cod_upgd or ""
-    if not cod_upgd:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El usuario UPGD no tiene una UPGD asignada (cod_upgd vacío).",
-        )
+    """Crea una notificación individual de datos básicos (cualquier rol autenticado).
+
+    Desacople RBAC (FP3): el `cod_upgd` final prioriza la UPGD propia del usuario,
+    luego el valor del payload y, como último recurso, la UPGD demo. Ya no se
+    rechaza con 400 por `cod_upgd` vacío.
+    """
+    cod_upgd = current_user.cod_upgd or payload.cod_upgd or _COD_UPGD_DEMO
 
     datos = payload.model_dump()
     datos["cod_upgd"] = cod_upgd
