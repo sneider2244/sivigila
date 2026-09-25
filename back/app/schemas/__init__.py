@@ -5,6 +5,11 @@ from app.schemas.catalogo import (
     MunicipioOut,
     OcupacionOut,
 )
+from app.schemas.ficha_basica import (
+    FichaDatosBasicosCreate,
+    FichaDatosBasicosOut,
+    FichaDatosBasicosUpdate,
+)
 from app.schemas.upgd import (
     UPGDCaracterizacionCreate,
     UPGDCaracterizacionOut,
@@ -22,6 +27,9 @@ __all__ = [
     "DepartamentoOut",
     "EtniaOut",
     "EventoOut",
+    "FichaDatosBasicosCreate",
+    "FichaDatosBasicosOut",
+    "FichaDatosBasicosUpdate",
     "LoginRequest",
     "LoginResponse",
     "MunicipioOut",
