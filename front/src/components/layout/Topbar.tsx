@@ -46,7 +46,7 @@ export function Topbar() {
         <span className={styles.name}>{user?.nombreCompleto ?? "—"}</span>
         {user && !isDocente && (
           <div className={styles.rolRow}>
-            <select
+            {/* <select
               className={styles.rolSelect}
               value={user.rol}
               onChange={handleRolChange}
@@ -58,7 +58,7 @@ export function Topbar() {
                   {rol}
                 </option>
               ))}
-            </select>
+            </select> */}
             {user.codUpgd ? (
               <span className={styles.meta}>· {user.codUpgd}</span>
             ) : null}
@@ -74,13 +74,6 @@ export function Topbar() {
       </div>
 
       <div className={styles.actions}>
-        <button
-          type="button"
-          className={styles.button}
-          onClick={() => setSearchOpen(true)}
-        >
-          Buscar casos
-        </button>
         <button
           type="button"
           className={styles.button}

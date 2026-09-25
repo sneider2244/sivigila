@@ -159,7 +159,6 @@ export default function DetalleEscenarioPage() {
 
       {tab === "asignar" ? (
         <Section
-          step="01"
           title="Asignar estudiantes"
           subtitle="Buscá y seleccioná estudiantes para asignarles este escenario"
         >
@@ -167,7 +166,6 @@ export default function DetalleEscenarioPage() {
         </Section>
       ) : (
         <Section
-          step="02"
           title={`Asignaciones (${asignaciones.length})`}
           subtitle="Estudiantes asignados a este escenario"
         >
