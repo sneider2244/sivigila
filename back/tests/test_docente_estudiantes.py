@@ -329,3 +329,18 @@ async def test_asignaciones_por_escenario_no_docente_403(client: AsyncClient) ->
         f"/api/v1/docente/escenarios/{esc['id']}/asignaciones", headers=_auth(token)
     )
     assert resp.status_code == 403
+
+
+async def test_obtener_escenario_por_id(client: AsyncClient) -> None:
+    token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, token, titulo="Escenario por id")
+
+    resp = await client.get(
+        f"/api/v1/docente/escenarios/{esc['id']}", headers=_auth(token)
+    )
+    assert resp.status_code == 200
+    assert resp.json()["id"] == esc["id"]
+    assert resp.json()["titulo"] == "Escenario por id"
+
+    resp = await client.get("/api/v1/docente/escenarios/999999", headers=_auth(token))
+    assert resp.status_code == 404

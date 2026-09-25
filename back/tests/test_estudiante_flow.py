@@ -268,3 +268,48 @@ async def test_get_escenarios_sin_datos_esperados(client: AsyncClient) -> None:
     assert set(item["escenario"].keys()) == {"id", "titulo", "descripcion", "cod_evento"}
     assert "datos_esperados" not in item
     assert "datos_esperados" not in item["escenario"]
+
+
+async def test_progreso_ok_en_progreso(client: AsyncClient) -> None:
+    """El guardado parcial vincula la ficha y marca EN_PROGRESO (sin completar)."""
+    docente_token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, docente_token, titulo="Progreso FP3")
+
+    muni_login = await _login_response(client, MUNI_USERNAME, MUNI_PASSWORD)
+    muni_token = muni_login["access_token"]
+    muni_id = muni_login["usuario"]["id"]
+
+    asignaciones = await _asignar(client, docente_token, esc["id"], [muni_id])
+    asignacion_id = asignaciones[0]["id"]
+
+    ficha = await _crear_ficha(client, muni_token)
+
+    resp = await client.post(
+        f"/api/v1/estudiante/escenarios/{asignacion_id}/progreso",
+        json={"ficha_basica_id": ficha["id"]},
+        headers=_auth(muni_token),
+    )
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert data["estado"] == "EN_PROGRESO"
+    assert data["ficha_basica_id"] == ficha["id"]
+    assert data["escenario"]["id"] == esc["id"]
+
+
+async def test_progreso_asignacion_ajena_403(client: AsyncClient) -> None:
+    docente_token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, docente_token, titulo="Progreso ajeno FP3")
+
+    ajeno_id = (await _login_response(client, AJENO_USERNAME, AJENO_PASSWORD))["usuario"]["id"]
+    asignaciones = await _asignar(client, docente_token, esc["id"], [ajeno_id])
+    asignacion_id = asignaciones[0]["id"]
+
+    muni_token = await _login(client, MUNI_USERNAME, MUNI_PASSWORD)
+    ficha = await _crear_ficha(client, muni_token)
+
+    resp = await client.post(
+        f"/api/v1/estudiante/escenarios/{asignacion_id}/progreso",
+        json={"ficha_basica_id": ficha["id"]},
+        headers=_auth(muni_token),
+    )
+    assert resp.status_code == 403
