@@ -489,3 +489,78 @@ export function mapFichaDatosComplementariosToRaw(
     contenido: mapContenidoOfidicoToRaw(ficha.contenido),
   };
 }
+
+export interface EscenarioClinico {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  codEvento: string;
+  datosEsperados: unknown;
+  activo: boolean;
+}
+
+export interface EscenarioClinicoRaw {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  cod_evento: string;
+  datos_esperados: unknown;
+  activo: boolean;
+}
+
+export function mapEscenarioClinico(
+  raw: EscenarioClinicoRaw,
+): EscenarioClinico {
+  return {
+    id: raw.id,
+    titulo: raw.titulo,
+    descripcion: raw.descripcion,
+    codEvento: raw.cod_evento,
+    datosEsperados: raw.datos_esperados,
+    activo: raw.activo,
+  };
+}
+
+export interface EscenarioAsignacion {
+  id: number;
+  escenarioId: number;
+  escenarioTitulo: string;
+  estudianteId: number;
+  estudianteUsername: string;
+  estudianteNombre: string;
+  estado: string;
+  fichaBasicaId: number | null;
+}
+
+export interface EscenarioAsignacionRaw {
+  id: number;
+  escenario_id: number;
+  escenario_titulo: string;
+  estudiante_id: number;
+  estudiante_username: string;
+  estudiante_nombre: string;
+  estado: string;
+  ficha_basica_id: number | null;
+}
+
+export function mapEscenarioAsignacion(
+  raw: EscenarioAsignacionRaw,
+): EscenarioAsignacion {
+  return {
+    id: raw.id,
+    escenarioId: raw.escenario_id,
+    escenarioTitulo: raw.escenario_titulo,
+    estudianteId: raw.estudiante_id,
+    estudianteUsername: raw.estudiante_username,
+    estudianteNombre: raw.estudiante_nombre,
+    estado: raw.estado,
+    fichaBasicaId: raw.ficha_basica_id,
+  };
+}
+
+export interface EvaluacionResult {
+  puntaje: number;
+  aciertos: number;
+  total: number;
+  detalle: unknown;
+}

@@ -1,0 +1,332 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+  color: $primary;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  color: $text;
+  font-size: 1rem;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid $border;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  color: $text;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.875rem;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $primary-soft;
+  }
+
+  &[aria-invalid="true"] {
+    border-color: $danger;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cardTitle {
+  color: $text;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.badgeActive,
+.badgeInactive {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badgeActive {
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.badgeInactive {
+  color: $text-soft;
+  background: $bg;
+  border: 1px solid $border;
+}
+
+.cardDesc {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.cardMeta {
+  color: $text;
+  font-size: 0.875rem;
+}
+
+.jsonDetails {
+  font-size: 0.875rem;
+
+  summary {
+    cursor: pointer;
+    color: $primary;
+    font-weight: 600;
+  }
+}
+
+.json {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  overflow-x: auto;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.assign {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 220px;
+
+  @include responsive(sm) {
+    flex: 1 1 100%;
+  }
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  color: $surface;
+  background: $primary;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.buttonGhost {
+  padding: 0.5rem 1rem;
+  color: $primary;
+  background: transparent;
+  border: 1px solid $primary;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $primary-soft;
+  }
+}
+
+.asignacionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asignacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+
+.asignacionInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+}
+
+.asignacionEscenario {
+  color: $text;
+  font-weight: 700;
+}
+
+.asignacionEstudiante {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.estado {
+  padding: 0.25rem 0.75rem;
+  color: $primary;
+  background: $primary-soft;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.resultado {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-size: 0.875rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.accessDenied {
+  padding: 2rem;
+  text-align: center;
+  color: $text;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.banner {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.errorBanner {
+  padding: 0.75rem 1rem;
+  color: $danger;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.successBanner {
+  padding: 0.75rem 1rem;
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.submit {
+  align-self: flex-start;
+  padding: 0.75rem 2rem;
+  color: $surface;
+  background: $primary;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @include responsive(sm) {
+    width: 100%;
+  }
+}
