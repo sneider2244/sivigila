@@ -12,6 +12,15 @@ export async function getMisEscenarios(): Promise<EstudianteAsignacion[]> {
   return data.map(mapEstudianteAsignacion);
 }
 
+export async function progresarEscenario(
+  asignacionId: number,
+  fichaBasicaId: number,
+): Promise<void> {
+  await api.post(`/estudiante/escenarios/${asignacionId}/progreso`, {
+    ficha_basica_id: fichaBasicaId,
+  });
+}
+
 export async function entregarEscenario(
   asignacionId: number,
   fichaBasicaId: number,

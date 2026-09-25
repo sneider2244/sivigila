@@ -2,7 +2,7 @@
 @use "../../../../styles/mixins" as *;
 
 .page {
-  max-width: 760px;
+  max-width: $container-max;
   margin: 0 auto;
   padding: 1.5rem;
 }
@@ -31,10 +31,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 
   @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(sm) {
     grid-template-columns: 1fr;
   }
 }

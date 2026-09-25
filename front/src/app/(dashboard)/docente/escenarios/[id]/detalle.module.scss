@@ -2,7 +2,7 @@
 @use "../../../../../styles/mixins" as *;
 
 .page {
-  max-width: 860px;
+  max-width: $container-max;
   margin: 0 auto;
   padding: 1.5rem;
   display: flex;
@@ -64,6 +64,35 @@
 .actions {
   display: flex;
   justify-content: flex-start;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid $border;
+  padding-bottom: 0.5rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  color: $text-soft;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: $bg;
+  }
+}
+
+.tabActive {
+  color: $primary;
+  background: $primary-soft;
+  border-color: $primary;
 }
 
 .asignacionList {

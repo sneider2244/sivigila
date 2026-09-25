@@ -28,6 +28,15 @@ export async function getEscenarios(): Promise<EscenarioClinico[]> {
   return data.map(mapEscenarioClinico);
 }
 
+export async function getEscenario(
+  id: number,
+): Promise<EscenarioClinico> {
+  const { data } = await api.get<EscenarioClinicoRaw>(
+    `/docente/escenarios/${id}`,
+  );
+  return mapEscenarioClinico(data);
+}
+
 export async function createEscenario(
   input: CrearEscenarioInput,
 ): Promise<EscenarioClinico> {

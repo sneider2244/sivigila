@@ -19,7 +19,8 @@ const ESTADO_BADGE_CLASS: Record<EstudianteAsignacion["estado"], string> = {
 };
 
 function AsignacionCard({ asignacion }: { asignacion: EstudianteAsignacion }) {
-  const esCompletado = asignacion.estado === "COMPLETADO";
+  const esEnProgreso =
+    asignacion.estado === "EN_PROGRESO" && asignacion.fichaBasicaId != null;
 
   return (
     <article className={styles.card}>
@@ -36,8 +37,22 @@ function AsignacionCard({ asignacion }: { asignacion: EstudianteAsignacion }) {
         Evento: <strong>{asignacion.escenario.codEvento}</strong>
       </p>
       <div className={styles.cardActions}>
-        {esCompletado ? (
+        {asignacion.estado === "COMPLETADO" ? (
           <span className={styles.entregado}>Entregado</span>
+        ) : esEnProgreso ? (
+          <Link
+            className={styles.button}
+            href={{
+              pathname: "/notificacion/datos-complementarios",
+              query: {
+                asignacion_id: String(asignacion.id),
+                ficha_basica_id: String(asignacion.fichaBasicaId),
+                cod_evento: asignacion.escenario.codEvento,
+              },
+            }}
+          >
+            Continuar
+          </Link>
         ) : (
           <Link
             className={styles.button}

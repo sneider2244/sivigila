@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 560px;
+  max-width: $container-max;
   max-height: 80vh;
   background: $surface;
   border-radius: $radius;
@@ -68,8 +68,12 @@
 
 .fichaGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.875rem 1.5rem;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   @include responsive(sm) {
     grid-template-columns: 1fr;

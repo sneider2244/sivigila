@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
 import { createFichaDatosComplementarios } from "@/lib/fichas";
 import { entregarEscenario } from "@/lib/estudiante";
+import { useFormDraft } from "@/hooks/useFormDraft";
 import styles from "./datos-complementarios.module.scss";
 
 const COD_EVENTO = "100";
@@ -51,7 +52,9 @@ function DatosComplementariosForm() {
 
   const {
     register,
+    control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<DatosComplementariosFormValues>({
     resolver: zodResolver(datosComplementariosSchema),
@@ -62,6 +65,15 @@ function DatosComplementariosForm() {
       descripcion: "",
     },
   });
+
+  const formValues = useWatch({ control }) as DatosComplementariosFormValues;
+  const { clear: clearDraft } = useFormDraft<DatosComplementariosFormValues>(
+    asignacionId != null
+      ? `sivigila-draft-complementaria-${asignacionId}`
+      : null,
+    formValues,
+    (v) => reset(v),
+  );
 
   const onSubmit = async (values: DatosComplementariosFormValues) => {
     setSubmitError(null);
@@ -80,6 +92,7 @@ function DatosComplementariosForm() {
 
       if (asignacionId != null) {
         await entregarEscenario(asignacionId, values.ficha_basica_id);
+        clearDraft();
         router.replace("/mis-escenarios");
         return;
       }

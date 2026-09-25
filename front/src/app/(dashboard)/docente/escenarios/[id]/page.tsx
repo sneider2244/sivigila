@@ -10,10 +10,12 @@ import { FichaBasicaModal } from "@/components/docente/FichaBasicaModal";
 import { useUserStore } from "@/store/useUserStore";
 import {
   getAsignacionesPorEscenario,
-  getEscenarios,
+  getEscenario,
 } from "@/lib/docente";
 import type { EscenarioAsignacion } from "@/types";
 import styles from "./detalle.module.scss";
+
+type Tab = "asignaciones" | "asignar";
 
 function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
   const [verFicha, setVerFicha] = useState(false);
@@ -55,13 +57,17 @@ export default function DetalleEscenarioPage() {
   const params = useParams<{ id: string }>();
   const escenarioId = Number(params?.id);
 
-  const { data: escenarios = [] } = useQuery({
-    queryKey: ["docente", "escenarios"],
-    queryFn: getEscenarios,
-    enabled: isDocente,
-  });
+  const [tab, setTab] = useState<Tab>("asignaciones");
 
-  const escenario = escenarios.find((e) => e.id === escenarioId);
+  const {
+    data: escenario,
+    isLoading: escenarioLoading,
+    isError: escenarioError,
+  } = useQuery({
+    queryKey: ["docente", "escenarios", escenarioId],
+    queryFn: () => getEscenario(escenarioId),
+    enabled: isDocente && Number.isInteger(escenarioId) && escenarioId > 0,
+  });
 
   const {
     data: asignaciones = [],
@@ -81,7 +87,15 @@ export default function DetalleEscenarioPage() {
     );
   }
 
-  if (!escenario) {
+  if (escenarioLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.banner}>Cargando escenario…</div>
+      </div>
+    );
+  }
+
+  if (escenarioError || !escenario) {
     return (
       <div className={styles.page}>
         <div className={styles.actions}>
@@ -118,42 +132,69 @@ export default function DetalleEscenarioPage() {
         </div>
       </header>
 
-      <Section
-        step="01"
-        title="Asignar estudiantes"
-        subtitle="Buscá y seleccioná estudiantes para asignarles este escenario"
-      >
-        <EstudianteSelector escenario={escenario} />
-      </Section>
+      <div className={styles.tabs} role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "asignaciones"}
+          className={`${styles.tab} ${
+            tab === "asignaciones" ? styles.tabActive : ""
+          }`}
+          onClick={() => setTab("asignaciones")}
+        >
+          Asignaciones ({asignaciones.length})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "asignar"}
+          className={`${styles.tab} ${
+            tab === "asignar" ? styles.tabActive : ""
+          }`}
+          onClick={() => setTab("asignar")}
+        >
+          Asignar estudiantes
+        </button>
+      </div>
 
-      <Section
-        step="02"
-        title={`Asignaciones (${asignaciones.length})`}
-        subtitle="Estudiantes asignados a este escenario"
-      >
-        {asignacionesLoading && (
-          <p className={styles.banner}>Cargando asignaciones…</p>
-        )}
-        {asignacionesError && (
-          <p className={styles.errorBanner}>
-            No se pudieron cargar las asignaciones.
-          </p>
-        )}
-        {!asignacionesLoading &&
-          !asignacionesError &&
-          asignaciones.length === 0 && (
-            <p className={styles.banner}>
-              Aún no hay estudiantes asignados a este escenario.
+      {tab === "asignar" ? (
+        <Section
+          step="01"
+          title="Asignar estudiantes"
+          subtitle="Buscá y seleccioná estudiantes para asignarles este escenario"
+        >
+          <EstudianteSelector escenario={escenario} />
+        </Section>
+      ) : (
+        <Section
+          step="02"
+          title={`Asignaciones (${asignaciones.length})`}
+          subtitle="Estudiantes asignados a este escenario"
+        >
+          {asignacionesLoading && (
+            <p className={styles.banner}>Cargando asignaciones…</p>
+          )}
+          {asignacionesError && (
+            <p className={styles.errorBanner}>
+              No se pudieron cargar las asignaciones.
             </p>
           )}
-        {!asignacionesLoading && !asignacionesError && (
-          <ul className={styles.asignacionList}>
-            {asignaciones.map((asignacion) => (
-              <AsignacionRow key={asignacion.id} asignacion={asignacion} />
-            ))}
-          </ul>
-        )}
-      </Section>
+          {!asignacionesLoading &&
+            !asignacionesError &&
+            asignaciones.length === 0 && (
+              <p className={styles.banner}>
+                Aún no hay estudiantes asignados a este escenario.
+              </p>
+            )}
+          {!asignacionesLoading && !asignacionesError && (
+            <ul className={styles.asignacionList}>
+              {asignaciones.map((asignacion) => (
+                <AsignacionRow key={asignacion.id} asignacion={asignacion} />
+              ))}
+            </ul>
+          )}
+        </Section>
+      )}
     </div>
   );
 }

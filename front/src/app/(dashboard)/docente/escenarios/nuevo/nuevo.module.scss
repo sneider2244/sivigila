@@ -2,7 +2,7 @@
 @use "../../../../../styles/mixins" as *;
 
 .page {
-  max-width: 860px;
+  max-width: $container-max;
   margin: 0 auto;
   padding: 1.5rem;
 }

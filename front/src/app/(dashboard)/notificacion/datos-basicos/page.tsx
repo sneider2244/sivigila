@@ -12,6 +12,8 @@ import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { useUserStore } from "@/store/useUserStore";
 import { createFichaDatosBasicos } from "@/lib/fichas";
+import { progresarEscenario } from "@/lib/estudiante";
+import { useFormDraft } from "@/hooks/useFormDraft";
 import type {
   AreaOcurrencia,
   ClasificacionCaso,
@@ -182,6 +184,7 @@ function DatosBasicosForm() {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<DatosBasicosFormValues>({
     resolver: zodResolver(datosBasicosSchema),
@@ -230,6 +233,13 @@ function DatosBasicosForm() {
   const hospitalizado = useWatch({ control, name: "hospitalizado" });
   const condicionFinal = useWatch({ control, name: "condicionFinal" });
 
+  const formValues = useWatch({ control }) as DatosBasicosFormValues;
+  const { clear: clearDraft } = useFormDraft<DatosBasicosFormValues>(
+    asignacionId != null ? `sivigila-draft-basica-${asignacionId}` : null,
+    formValues,
+    (v) => reset(v),
+  );
+
   const onSubmit = async (values: DatosBasicosFormValues) => {
     setSubmitError(null);
     setSuccess(false);
@@ -277,6 +287,8 @@ function DatosBasicosForm() {
     try {
       const fichaCreada = await createFichaDatosBasicos(ficha);
       if (esEntrega && asignacionId != null) {
+        await progresarEscenario(asignacionId, fichaCreada.id);
+        clearDraft();
         const params = new URLSearchParams({
           asignacion_id: String(asignacionId),
           ficha_basica_id: String(fichaCreada.id),
