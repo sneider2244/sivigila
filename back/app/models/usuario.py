@@ -1,10 +1,16 @@
-import enum
+from __future__ import annotations
 
-from sqlalchemy import Boolean, Integer, String
+import enum
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.upgd import UPGDCaracterizacion
 
 
 class RolEnum(str, enum.Enum):  # noqa: UP042 - patrón documentado en BACKEND_ARCH.md
@@ -30,7 +36,15 @@ class Usuario(Base):
     rol: Mapped[RolEnum] = mapped_column(
         SQLEnum(RolEnum, name="rol_enum"), nullable=False, default=RolEnum.UPGD
     )
-    # RULING: sin ForeignKey a upgd_caracterizacion (tabla de Sprint 2, aún no existe).
-    # Se modela como String indexado; la FK/relationship se agrega en Sprint 2.
-    cod_upgd: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
+    cod_upgd: Mapped[str | None] = mapped_column(
+        String(20),
+        ForeignKey(
+            "upgd_caracterizacion.cod_prestador",
+            name="fk_usuarios_cod_upgd_upgd_caracterizacion",
+        ),
+        nullable=True,
+        index=True,
+    )
     activo: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    upgd: Mapped[UPGDCaracterizacion | None] = relationship(back_populates="usuarios")

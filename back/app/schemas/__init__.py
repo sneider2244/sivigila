@@ -5,6 +5,11 @@ from app.schemas.catalogo import (
     MunicipioOut,
     OcupacionOut,
 )
+from app.schemas.upgd import (
+    UPGDCaracterizacionCreate,
+    UPGDCaracterizacionOut,
+    UPGDCaracterizacionUpdate,
+)
 from app.schemas.usuario import (
     LoginRequest,
     LoginResponse,
@@ -23,5 +28,8 @@ __all__ = [
     "OcupacionOut",
     "RefreshRequest",
     "TokenResponse",
+    "UPGDCaracterizacionCreate",
+    "UPGDCaracterizacionOut",
+    "UPGDCaracterizacionUpdate",
     "UsuarioOut",
 ]

@@ -9,11 +9,15 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.core.database import async_session_factory
 from app.core.security import get_password_hash
 from app.models.catalogos import Departamento, Etnia, Evento, Municipio, Ocupacion
+from app.models.upgd import UPGDCaracterizacion
 from app.models.usuario import RolEnum, Usuario
 
 DEFAULT_ADMIN_USER = "docente"
 DEFAULT_ADMIN_PASSWORD = "docente123"
 DEFAULT_ADMIN_NOMBRE = "Usuario Docente"
+
+# UPGD de ejemplo vinculada al usuario DOCENTE (para que login/dashboard tenga datos).
+DEFAULT_UPGD_COD_PRESADOR = "150010123456"
 
 # ---------------------------------------------------------------------------
 # Catálogos oficiales (datos de referencia).
@@ -339,12 +343,39 @@ async def seed_catalogos(
     return inserted
 
 
+async def seed_upgd() -> None:
+    """Siembra idempotente una UPGD de ejemplo y la vincula al usuario DOCENTE."""
+    async with async_session_factory() as session:
+        upgd = await session.get(UPGDCaracterizacion, DEFAULT_UPGD_COD_PRESADOR)
+        if upgd is None:
+            session.add(
+                UPGDCaracterizacion(
+                    cod_prestador=DEFAULT_UPGD_COD_PRESADOR,
+                    razon_social="Hospital Simulado SIVIGILA",
+                    nit="900000000-1",
+                    nivel_complejidad=2,
+                    cove=True,
+                    unidad_analisis=True,
+                    internet=True,
+                    activo=True,
+                    departamento_codigo="05",
+                    municipio_codigo="05001",
+                )
+            )
+        user = await session.scalar(select(Usuario).where(Usuario.rol == RolEnum.DOCENTE))
+        if user is not None and user.cod_upgd != DEFAULT_UPGD_COD_PRESADOR:
+            user.cod_upgd = DEFAULT_UPGD_COD_PRESADOR
+        await session.commit()
+
+
 async def seed() -> None:
     """Ejecuta todos los seeds del proyecto."""
     await seed_users()
     inserted = await seed_catalogos()
+    await seed_upgd()
     print("Seed usuarios: OK (docente).")
     print(f"Seed catálogos: {inserted}")
+    print("Seed UPGD: OK (ejemplo vinculado a docente).")
 
 
 if __name__ == "__main__":
