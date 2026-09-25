@@ -1,0 +1,64 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.page {
+  max-width: $container-max;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  margin-bottom: 0;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+  color: $primary;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  color: $surface;
+  background: $primary;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.errorBanner {
+  padding: 0.75rem 1rem;
+  color: $danger;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.loading {
+  color: $text-soft;
+  font-size: 0.875rem;
+  padding: 1.5rem;
+}

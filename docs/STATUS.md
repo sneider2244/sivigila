@@ -88,6 +88,8 @@ Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos
 - **R29** Ancho normalizado a `$container-max: 1200px` (se eliminaron los límites de 760/860/960px en todo el dashboard); grillas de formularios a 3 columnas (responsive 3→2→1); modal `FichaBasicaModal` sin tope de 560px. (Coste: ninguno, es consistencia visual.)
 - **R30** Detalle docente con tabs "Asignaciones" (default) / "Asignar estudiantes". (Coste: un clic extra para asignar; se prioriza la lectura de asignaciones.)
 - **R31** Guardado parcial: `POST /estudiante/escenarios/{id}/progreso` (EN_PROGRESO) al guardar la básica; `entregar` (COMPLETADO) al final. El estudiante puede retomar: `EN_PROGRESO` → "Continuar" (va a complementarios con su `ficha_basica_id`). Además borrador auto-guardado en localStorage (`useFormDraft`) por asignación para no perder lo tipeado. (Coste: el draft vive en el navegador; si cambia de dispositivo no se transfiere.)
+- **R32** Descripción del caso visible en los formularios: banner `CaseBanner` arriba de básica/complementaria, alimentado por `GET /estudiante/escenarios/{id}`. (Coste: una llamada extra al entrar al form; evita perder el contexto del caso.)
+- **R33** Visor de ficha compartido `FichaViewer`/`FichaViewerModal` (migrado de `FichaBasicaModal`); el estudiante puede ver sus respuestas: botón "Ver mi ficha" en `/mis-escenarios` y **resumen post-entrega** en `/notificacion/resumen`. (Coste: el visor solo muestra lo registrado; no expone `datos_esperados`.)
 
 ## Progreso
 
@@ -110,6 +112,7 @@ Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos
 - `2026-09-25` **FP8 (iteración) — fix 403 + complementaria genérica + diseño**. Backend: RBAC de complementarias desacoplado (fix 403), `contenido` genérico (sin validación ofídico), `77 passed`. Frontend: complementaria genérica (`fecha_evento/lugar/descripcion`); componente `Section` con badge numerado (mockup); "Ver ficha" agrupado + muestra complementaria. lint + build limpios.
 - `2026-09-25` **FP9 (iteración) — área docente en páginas separadas**. Backend: `GET /docente/escenarios/{id}/asignaciones` + `estudiante_numero_identificacion` en `AsignacionOut` (`80 passed`). Frontend: lista `/docente/escenarios`, crear `/docente/escenarios/nuevo`, detalle `/docente/escenarios/[id]` con asignaciones del caso (buscador + checkboxes + contador). lint + build limpios.
 - `2026-09-25` **FP10 (iteración) — 1200px/3col, tabs docente y guardado parcial**. Backend: `GET /docente/escenarios/{id}` + `POST .../progreso` (`83 passed`). Frontend: `$container-max: 1200px` en todo el dashboard + grids 3 columnas + modal sin tope; tabs "Asignaciones/Asignar" en detalle; `useFormDraft` (borrador en localStorage) + flujo ASIGNADO→EN_PROGRESO→COMPLETADO con "Continuar". lint + build limpios.
+- `2026-09-25` **FP11 (iteración) — caso visible y ver respuestas**. Backend: `GET /estudiante/escenarios/{id}` (`86 passed`). Frontend: `CaseBanner` con la descripción del caso en básica/complementaria; visor compartido `FichaViewer`/`FichaViewerModal` (migrado); botón "Ver mi ficha" en `/mis-escenarios`; resumen post-entrega en `/notificacion/resumen`. lint + build limpios.
 
 ## Deferred del flujo (no bloquean, para pulido posterior)
 

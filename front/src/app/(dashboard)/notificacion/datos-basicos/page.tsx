@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { useUserStore } from "@/store/useUserStore";
+import { CaseBanner } from "@/components/ficha/CaseBanner";
 import { createFichaDatosBasicos } from "@/lib/fichas";
 import { progresarEscenario } from "@/lib/estudiante";
 import { useFormDraft } from "@/hooks/useFormDraft";
@@ -319,6 +320,10 @@ function DatosBasicosForm() {
           Notificación individual de caso en salud pública.
         </p>
       </header>
+
+      {esEntrega && asignacionId != null && (
+        <CaseBanner asignacionId={asignacionId} />
+      )}
 
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
         <section className={styles.section}>

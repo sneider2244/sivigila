@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getMisEscenarios } from "@/lib/estudiante";
+import { FichaViewerModal } from "@/components/ficha/FichaViewer";
 import type { EstudianteAsignacion } from "@/types";
 import styles from "./mis-escenarios.module.scss";
 
@@ -19,6 +21,7 @@ const ESTADO_BADGE_CLASS: Record<EstudianteAsignacion["estado"], string> = {
 };
 
 function AsignacionCard({ asignacion }: { asignacion: EstudianteAsignacion }) {
+  const [verFicha, setVerFicha] = useState(false);
   const esEnProgreso =
     asignacion.estado === "EN_PROGRESO" && asignacion.fichaBasicaId != null;
 
@@ -67,7 +70,22 @@ function AsignacionCard({ asignacion }: { asignacion: EstudianteAsignacion }) {
             Diligenciar
           </Link>
         )}
+        {asignacion.fichaBasicaId != null && (
+          <button
+            type="button"
+            className={styles.buttonGhost}
+            onClick={() => setVerFicha(true)}
+          >
+            Ver mi ficha
+          </button>
+        )}
       </div>
+      {verFicha && asignacion.fichaBasicaId != null && (
+        <FichaViewerModal
+          fichaBasicaId={asignacion.fichaBasicaId}
+          onClose={() => setVerFicha(false)}
+        />
+      )}
     </article>
   );
 }

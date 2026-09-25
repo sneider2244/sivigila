@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Section } from "@/components/ui/Section";
 import { EstudianteSelector } from "@/components/docente/EstudianteSelector";
-import { FichaBasicaModal } from "@/components/docente/FichaBasicaModal";
+import { FichaViewerModal } from "@/components/ficha/FichaViewer";
 import { useUserStore } from "@/store/useUserStore";
 import {
   getAsignacionesPorEscenario,
@@ -41,7 +41,7 @@ function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
         </button>
       )}
       {verFicha && asignacion.fichaBasicaId != null && (
-        <FichaBasicaModal
+        <FichaViewerModal
           fichaBasicaId={asignacion.fichaBasicaId}
           onClose={() => setVerFicha(false)}
         />

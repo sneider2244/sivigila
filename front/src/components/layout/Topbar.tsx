@@ -40,7 +40,7 @@ export function Topbar() {
 
   return (
     <div className={styles.topbar}>
-      <span className={styles.brand}>SIVIGILA</span>
+      <span className={styles.brand}>Simulador SIVIGILA</span>
 
       <div className={styles.user}>
         <span className={styles.name}>{user?.nombreCompleto ?? "—"}</span>

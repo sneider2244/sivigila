@@ -9,6 +9,7 @@ import axios from "axios";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
+import { CaseBanner } from "@/components/ficha/CaseBanner";
 import { createFichaDatosComplementarios } from "@/lib/fichas";
 import { entregarEscenario } from "@/lib/estudiante";
 import { useFormDraft } from "@/hooks/useFormDraft";
@@ -93,7 +94,11 @@ function DatosComplementariosForm() {
       if (asignacionId != null) {
         await entregarEscenario(asignacionId, values.ficha_basica_id);
         clearDraft();
-        router.replace("/mis-escenarios");
+        const params = new URLSearchParams({
+          ficha_basica_id: String(values.ficha_basica_id),
+          asignacion_id: String(asignacionId),
+        });
+        router.replace(`/notificacion/resumen?${params.toString()}`);
         return;
       }
       setSuccess(true);
@@ -116,6 +121,8 @@ function DatosComplementariosForm() {
           Información complementaria del evento notificado.
         </p>
       </header>
+
+      {asignacionId != null && <CaseBanner asignacionId={asignacionId} />}
 
       {!idFromQuery && (
         <p className={styles.errorBanner}>

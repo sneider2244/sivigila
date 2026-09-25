@@ -5,7 +5,7 @@ import { Section } from "@/components/ui/Section";
 import { getFichaBasica } from "@/lib/docente";
 import { getFichaDatosComplementarios } from "@/lib/fichas";
 import type { FichaDatosBasicosOut } from "@/types";
-import styles from "./FichaBasicaModal.module.scss";
+import styles from "./FichaViewer.module.scss";
 
 function FichaItem({ label, valor }: { label: string; valor: string }) {
   return (
@@ -143,13 +143,7 @@ function DatosComplementariosResumen({
   );
 }
 
-export function FichaBasicaModal({
-  fichaBasicaId,
-  onClose,
-}: {
-  fichaBasicaId: number;
-  onClose: () => void;
-}) {
+export function FichaViewer({ fichaBasicaId }: { fichaBasicaId: number }) {
   const {
     data: ficha,
     isLoading,
@@ -167,6 +161,38 @@ export function FichaBasicaModal({
     queryFn: () => getFichaDatosComplementarios(fichaBasicaId),
   });
 
+  return (
+    <div>
+      {isLoading && <p className={styles.banner}>Cargando ficha…</p>}
+      {isError && (
+        <p className={styles.errorBanner}>No se pudo cargar la ficha.</p>
+      )}
+      {ficha && (
+        <>
+          <FichaResumen ficha={ficha} />
+          {complementariaLoading && (
+            <p className={styles.banner}>
+              Cargando datos complementarios…
+            </p>
+          )}
+          {!complementariaLoading && (
+            <DatosComplementariosResumen
+              contenido={complementaria?.contenido ?? {}}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+export function FichaViewerModal({
+  fichaBasicaId,
+  onClose,
+}: {
+  fichaBasicaId: number;
+  onClose: () => void;
+}) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div
@@ -190,25 +216,7 @@ export function FichaBasicaModal({
           </button>
         </header>
         <div className={styles.modalBody}>
-          {isLoading && <p className={styles.banner}>Cargando ficha…</p>}
-          {isError && (
-            <p className={styles.errorBanner}>No se pudo cargar la ficha.</p>
-          )}
-          {ficha && (
-            <>
-              <FichaResumen ficha={ficha} />
-              {complementariaLoading && (
-                <p className={styles.banner}>
-                  Cargando datos complementarios…
-                </p>
-              )}
-              {!complementariaLoading && (
-                <DatosComplementariosResumen
-                  contenido={complementaria?.contenido ?? {}}
-                />
-              )}
-            </>
-          )}
+          <FichaViewer fichaBasicaId={fichaBasicaId} />
         </div>
       </div>
     </div>
