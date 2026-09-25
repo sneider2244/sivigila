@@ -6,12 +6,20 @@ export type Rol =
   | "NACIONAL"
   | "DOCENTE";
 
-export interface User {
-  id: string;
-  nombre: string;
-  email: string;
+export interface Usuario {
+  id: number;
+  username: string;
+  nombreCompleto: string;
   rol: Rol;
-  codUpgd?: string;
+  codUpgd: string | null;
+  activo: boolean;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  user: Usuario;
 }
 
 export interface UPGD {

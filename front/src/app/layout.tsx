@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/main.scss";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "SIVIGILA",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
