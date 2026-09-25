@@ -95,3 +95,191 @@ export function mapUpgdCaracterizacionToRaw(
     municipio_codigo: upgd.municipioCodigo,
   };
 }
+
+export type Sexo = "M" | "F";
+export type UnidadMedidaEdad = 1 | 2 | 3;
+export type AreaOcurrencia = 1 | 2 | 3;
+export type ClasificacionCaso = 1 | 2 | 3 | 4;
+export type CondicionFinal = 1 | 2;
+
+export interface GruposPoblacionales {
+  gestante: boolean;
+  semanasGestacion: number | null;
+  desplazado: boolean;
+  otraIdentidad: string | null;
+  fHospitalizacion: string | null;
+  fDefuncion: string | null;
+  certificado: string | null;
+}
+
+export interface FichaDatosBasicos {
+  codUpgd: string;
+  subindice: string;
+  codEvento: string;
+  fGrabacion: string;
+  fNotificacion: string;
+  anio: number;
+  semanaEpidemiologica: number;
+  tipoId: string;
+  numId: string;
+  primerNombre: string;
+  segundoNombre: string | null;
+  primerApellido: string;
+  segundoApellido: string | null;
+  telefono: string | null;
+  fNacimiento: string;
+  edad: number;
+  undMedEdad: UnidadMedidaEdad;
+  sexo: Sexo;
+  identidadGenero: number;
+  orientacionSexual: number;
+  paisOcurrencia: string;
+  dptoOcurrencia: string;
+  muniOcurrencia: string;
+  areaOcurrencia: AreaOcurrencia;
+  gruposPoblacionales: GruposPoblacionales;
+  clasificacionCaso: ClasificacionCaso;
+  hospitalizado: boolean;
+  condicionFinal: CondicionFinal;
+}
+
+export interface GruposPoblacionalesRaw {
+  gestante: boolean;
+  semanas_gestacion: number | null;
+  desplazado: boolean;
+  otra_identidad: string | null;
+  f_hospitalizacion: string | null;
+  f_defuncion: string | null;
+  certificado: string | null;
+}
+
+export interface FichaDatosBasicosRaw {
+  cod_upgd: string;
+  subindice: string;
+  cod_evento: string;
+  f_grabacion: string;
+  f_notificacion: string;
+  anio: number;
+  semana_epidemiologica: number;
+  tipo_id: string;
+  num_id: string;
+  primer_nombre: string;
+  segundo_nombre: string | null;
+  primer_apellido: string;
+  segundo_apellido: string | null;
+  telefono: string | null;
+  f_nacimiento: string;
+  edad: number;
+  und_med_edad: UnidadMedidaEdad;
+  sexo: Sexo;
+  identidad_genero: number;
+  orientacion_sexual: number;
+  pais_ocurrencia: string;
+  dpto_ocurrencia: string;
+  muni_ocurrencia: string;
+  area_ocurrencia: AreaOcurrencia;
+  grupos_poblacionales: GruposPoblacionalesRaw;
+  clasificacion_caso: ClasificacionCaso;
+  hospitalizado: boolean;
+  condicion_final: CondicionFinal;
+}
+
+export function mapGruposPoblacionales(
+  raw: GruposPoblacionalesRaw,
+): GruposPoblacionales {
+  return {
+    gestante: raw.gestante,
+    semanasGestacion: raw.semanas_gestacion,
+    desplazado: raw.desplazado,
+    otraIdentidad: raw.otra_identidad,
+    fHospitalizacion: raw.f_hospitalizacion,
+    fDefuncion: raw.f_defuncion,
+    certificado: raw.certificado,
+  };
+}
+
+export function mapGruposPoblacionalesToRaw(
+  grupos: GruposPoblacionales,
+): GruposPoblacionalesRaw {
+  return {
+    gestante: grupos.gestante,
+    semanas_gestacion: grupos.semanasGestacion,
+    desplazado: grupos.desplazado,
+    otra_identidad: grupos.otraIdentidad,
+    f_hospitalizacion: grupos.fHospitalizacion,
+    f_defuncion: grupos.fDefuncion,
+    certificado: grupos.certificado,
+  };
+}
+
+export function mapFichaDatosBasicos(
+  raw: FichaDatosBasicosRaw,
+): FichaDatosBasicos {
+  return {
+    codUpgd: raw.cod_upgd,
+    subindice: raw.subindice,
+    codEvento: raw.cod_evento,
+    fGrabacion: raw.f_grabacion,
+    fNotificacion: raw.f_notificacion,
+    anio: raw.anio,
+    semanaEpidemiologica: raw.semana_epidemiologica,
+    tipoId: raw.tipo_id,
+    numId: raw.num_id,
+    primerNombre: raw.primer_nombre,
+    segundoNombre: raw.segundo_nombre,
+    primerApellido: raw.primer_apellido,
+    segundoApellido: raw.segundo_apellido,
+    telefono: raw.telefono,
+    fNacimiento: raw.f_nacimiento,
+    edad: raw.edad,
+    undMedEdad: raw.und_med_edad,
+    sexo: raw.sexo,
+    identidadGenero: raw.identidad_genero,
+    orientacionSexual: raw.orientacion_sexual,
+    paisOcurrencia: raw.pais_ocurrencia,
+    dptoOcurrencia: raw.dpto_ocurrencia,
+    muniOcurrencia: raw.muni_ocurrencia,
+    areaOcurrencia: raw.area_ocurrencia,
+    gruposPoblacionales: mapGruposPoblacionales(raw.grupos_poblacionales),
+    clasificacionCaso: raw.clasificacion_caso,
+    hospitalizado: raw.hospitalizado,
+    condicionFinal: raw.condicion_final,
+  };
+}
+
+export function mapFichaDatosBasicosToRaw(
+  ficha: FichaDatosBasicos,
+): FichaDatosBasicosRaw {
+  return {
+    cod_upgd: ficha.codUpgd,
+    subindice: ficha.subindice,
+    cod_evento: ficha.codEvento,
+    f_grabacion: ficha.fGrabacion,
+    f_notificacion: ficha.fNotificacion,
+    anio: ficha.anio,
+    semana_epidemiologica: ficha.semanaEpidemiologica,
+    tipo_id: ficha.tipoId,
+    num_id: ficha.numId,
+    primer_nombre: ficha.primerNombre,
+    segundo_nombre: ficha.segundoNombre,
+    primer_apellido: ficha.primerApellido,
+    segundo_apellido: ficha.segundoApellido,
+    telefono: ficha.telefono,
+    f_nacimiento: ficha.fNacimiento,
+    edad: ficha.edad,
+    und_med_edad: ficha.undMedEdad,
+    sexo: ficha.sexo,
+    identidad_genero: ficha.identidadGenero,
+    orientacion_sexual: ficha.orientacionSexual,
+    pais_ocurrencia: ficha.paisOcurrencia,
+    dpto_ocurrencia: ficha.dptoOcurrencia,
+    muni_ocurrencia: ficha.muniOcurrencia,
+    area_ocurrencia: ficha.areaOcurrencia,
+    grupos_poblacionales: mapGruposPoblacionalesToRaw(
+      ficha.gruposPoblacionales,
+    ),
+    clasificacion_caso: ficha.clasificacionCaso,
+    hospitalizado: ficha.hospitalizado,
+    condicion_final: ficha.condicionFinal,
+  };
+}

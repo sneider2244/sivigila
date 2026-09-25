@@ -27,9 +27,9 @@
 ## Sprint 2 — Caracterización UPGD y Notificación Individual Básica
 
 - [x] **B4** CRUD Caracterización UPGD (modelo + FK Usuario + endpoints + RBAC) — ver `docs/reports/B4-report.md`
-- [ ] **B5** CRUD Notificación Individual - Datos Básicos (modelo FichaDatosBasicos + endpoints + RBAC)
+- [x] **B5** CRUD Notificación Individual - Datos Básicos (modelo FichaDatosBasicos + endpoints + RBAC) — ver `docs/reports/B5-report.md`
 - [x] **F3** Formulario responsivo Caracterización UPGD — ver `docs/reports/F3-report.md`
-- [ ] **F4** Formulario Datos Básicos con validaciones dependientes
+- [x] **F4** Formulario Datos Básicos con validaciones dependientes — ver `docs/reports/F4-report.md`
 
 ## Rulings (decisiones tomadas en nombre del usuario)
 
@@ -46,6 +46,7 @@
 - **R11** Endpoints `/catalogos/*` sin auth (datos de referencia para comboboxes pre-login). (Coste: si luego se requiere restringirlos, hay que agregar dependencia de auth y tests.)
 - **R12** Rol `UI` queda 403 en `/upgd` (la matriz RBAC no le asigna gestión de caracterización; UI solo notifica/transfiere casos). (Coste: si luego UI necesita leer UPGD, agregar permiso.)
 - **R13** No hay naming convention global en `Base.metadata` (las FKs se nombran explícitamente). Evaluar adoptar `naming_convention` en un PR futuro para estabilizar `alembic autogenerate`. (Coste: autogenerate puede proponer renombres si no se cuida.)
+- **R14** Los campos condicionales del frontend (otraIdentidad, grupoÉtnico, fHospitalización, fDefunción, certificado, gestante, desplazado) se mapean al JSONB `fichas_datos_basicos.grupos_poblacionales` (claves snake_case: `otra_identidad`, `grupo_etnico`, `gestante`, `semanas_gestacion`, `desplazado`, `f_hospitalizacion`, `f_defuncion`, `certificado`). El backend solo persiste el dict. Motivo: el modelo documentado en `BACKEND_ARCH.md` no lista esas columnas y `grupos_poblacionales` es el bucket JSONB para datos dinámicos. (Coste: menos tipado estricto en esos campos; se puede migrar a columnas si se requiere integridad referencial.)
 
 ## Progreso
 
@@ -53,7 +54,7 @@
 - `2026-09-25` B2 y F2 completos. Backend: pytest `6 passed`, ruff clean, `alembic upgrade head` (tabla `usuarios` + enum `rol_enum`), login verificado en vivo (200). Frontend: lint + build limpios; contrato de login reconciliado con backend (R10). Quedan 2 warnings no bloqueantes en backend: `SECRET_KEY` default corto (rotar en prod) y ajustes de lint documentados.
 - `2026-09-25` B3 completo → **Sprint 1 terminado**. pytest `13 passed`, ruff clean, migración `catalogos` aplicada, seed idempotente. Sembrado: 33 departamentos, 124 municipios, 19 eventos, 13 ocupaciones, 6 etnias (datos curados, no completos — ampliar sin tocar el seed). Endpoints `/catalogos/*` sin auth (R11).
 - `2026-09-25` B4 + F3 completos. Backend: pytest `21 passed`, ruff clean, migración `upgd_caracterizacion` aplicada + FK `usuarios.cod_upgd` (R7 resuelta). Frontend: lint + build limpios, ruta `/caracterizacion` prerenderizada.
-
+- `2026-09-25` B5 + F4 completos → **Sprint 2 terminado**. Backend: pytest `29 passed`, ruff clean, migración `ficha_datos_basicos` aplicada; UPGD fuerza su `cod_upgd`, filtros de listado. Frontend: lint + build limpios, ruta `/notificacion/datos-basicos`; validaciones dependientes vía Zod + `grupos_poblacionales` (R14). Deferred menores: catálogos static placeholder en F4 (wirear a `useCatalogos`) y `cod_upgd` de ficha sin FK (evaluar en Sprint 3).
 ## Descubrimientos
 
 - **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.
