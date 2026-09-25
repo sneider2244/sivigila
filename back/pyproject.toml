@@ -42,6 +42,10 @@ select = ["E", "F", "I", "UP", "B", "W"]
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
 
+[tool.ruff.lint.flake8-bugbear]
+# `Depends(...)` en defaults es el patrón idiomático de FastAPI.
+extend-immutable-calls = ["fastapi.Depends"]
+
 [tool.ruff.lint.per-file-ignores]
 # Las migraciones son generadas por Alembic y no siguen las reglas de lint.
 "alembic/versions/*" = ["E501", "F401", "I001", "UP007", "UP035", "W291"]
