@@ -62,6 +62,7 @@ class AsignacionOut(BaseModel):
     estudiante_id: int
     estudiante_username: str
     estudiante_nombre: str
+    estudiante_numero_identificacion: str | None
     estado: EstadoAsignacion
     ficha_basica_id: int | None
 

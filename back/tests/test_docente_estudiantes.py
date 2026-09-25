@@ -288,3 +288,44 @@ async def test_bulk_asignar_no_docente_403(client: AsyncClient) -> None:
         headers=_auth(token),
     )
     assert resp.status_code == 403
+
+
+async def test_asignaciones_por_escenario(client: AsyncClient) -> None:
+    token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, token, titulo="Asignaciones por escenario")
+    ids = [_IDS["fp2_ana@test.com"], _IDS["fp2_benito@test.com"]]
+    await client.post(
+        f"/api/v1/docente/escenarios/{esc['id']}/asignar",
+        json={"estudiante_ids": ids},
+        headers=_auth(token),
+    )
+
+    resp = await client.get(
+        f"/api/v1/docente/escenarios/{esc['id']}/asignaciones",
+        headers=_auth(token),
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 2
+    assert all(a["escenario_id"] == esc["id"] for a in data)
+    por_id = {a["estudiante_id"]: a for a in data}
+    assert por_id[_IDS["fp2_ana@test.com"]]["estudiante_numero_identificacion"] == "FP2001"
+    assert all("estudiante_numero_identificacion" in a for a in data)
+
+
+async def test_asignaciones_por_escenario_inexistente_404(client: AsyncClient) -> None:
+    token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    resp = await client.get(
+        "/api/v1/docente/escenarios/999999/asignaciones", headers=_auth(token)
+    )
+    assert resp.status_code == 404
+
+
+async def test_asignaciones_por_escenario_no_docente_403(client: AsyncClient) -> None:
+    docente_token = await _login(client, DOCENTE_USERNAME, DOCENTE_PASSWORD)
+    esc = await _crear_escenario(client, docente_token, titulo="Asignaciones 403")
+    token = await _login(client, UPGD_USERNAME, UPGD_PASSWORD)
+    resp = await client.get(
+        f"/api/v1/docente/escenarios/{esc['id']}/asignaciones", headers=_auth(token)
+    )
+    assert resp.status_code == 403

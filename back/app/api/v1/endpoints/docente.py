@@ -180,6 +180,7 @@ async def asignar_escenarios(
                 estudiante_id=estudiante.id,
                 estudiante_username=estudiante.username,
                 estudiante_nombre=estudiante.nombre_completo,
+                estudiante_numero_identificacion=estudiante.numero_identificacion,
                 estado=asignacion.estado,
                 ficha_basica_id=asignacion.ficha_basica_id,
             )
@@ -201,6 +202,7 @@ async def listar_asignaciones(
             EscenarioClinico.titulo,
             Usuario.username,
             Usuario.nombre_completo,
+            Usuario.numero_identificacion,
         )
         .join(EscenarioClinico, EscenarioClinico.id == EscenarioAsignacion.escenario_id)
         .join(Usuario, Usuario.id == EscenarioAsignacion.estudiante_id)
@@ -215,10 +217,59 @@ async def listar_asignaciones(
             estudiante_id=asignacion.estudiante_id,
             estudiante_username=username,
             estudiante_nombre=nombre_completo,
+            estudiante_numero_identificacion=numero_identificacion,
             estado=asignacion.estado,
             ficha_basica_id=asignacion.ficha_basica_id,
         )
-        for asignacion, titulo, username, nombre_completo in rows
+        for asignacion, titulo, username, nombre_completo, numero_identificacion in rows
+    ]
+
+
+@router.get(
+    "/docente/escenarios/{escenario_id}/asignaciones",
+    response_model=list[AsignacionOut],
+)
+async def listar_asignaciones_escenario(
+    escenario_id: int,
+    current_user: Usuario = Depends(_docente_dependency),
+    db: AsyncSession = Depends(get_db),
+) -> list[AsignacionOut]:
+    """Lista las asignaciones de UN escenario con datos del estudiante (DOCENTE).
+
+    Ordenado por nombre para facilitar la revisión de muchos estudiantes.
+    """
+    escenario = await db.get(EscenarioClinico, escenario_id)
+    if escenario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_ESCENARIO_NO_ENCONTRADO,
+        )
+
+    stmt = (
+        select(
+            EscenarioAsignacion,
+            Usuario.username,
+            Usuario.nombre_completo,
+            Usuario.numero_identificacion,
+        )
+        .join(Usuario, Usuario.id == EscenarioAsignacion.estudiante_id)
+        .where(EscenarioAsignacion.escenario_id == escenario_id)
+        .order_by(Usuario.nombre_completo)
+    )
+    rows = (await db.execute(stmt)).all()
+    return [
+        AsignacionOut(
+            id=asignacion.id,
+            escenario_id=escenario_id,
+            escenario_titulo=escenario.titulo,
+            estudiante_id=asignacion.estudiante_id,
+            estudiante_username=username,
+            estudiante_nombre=nombre_completo,
+            estudiante_numero_identificacion=numero_identificacion,
+            estado=asignacion.estado,
+            ficha_basica_id=asignacion.ficha_basica_id,
+        )
+        for asignacion, username, nombre_completo, numero_identificacion in rows
     ]
 
 
