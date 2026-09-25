@@ -11,15 +11,18 @@ from app.core.security import (
     create_refresh_token,
     decode_token,
     get_current_user,
+    get_password_hash,
     oauth2_scheme,
     token_remaining_ttl,
     verify_password,
 )
-from app.models.usuario import Usuario
+from app.models.usuario import RolEnum, Usuario
 from app.schemas.usuario import (
     LoginRequest,
     LoginResponse,
     RefreshRequest,
+    RegisterRequest,
+    RolUpdateRequest,
     TokenResponse,
     UsuarioOut,
 )
@@ -27,6 +30,8 @@ from app.schemas.usuario import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 _CREDENCIALES_INVALIDAS = "Credenciales inválidas"
+_COD_UPGD_DEMO = "150010123456"
+_DOCENTE_NO_DISPONIBLE = "El rol DOCENTE no está disponible"
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -91,4 +96,62 @@ async def logout(
 @router.get("/me", response_model=UsuarioOut)
 async def me(current_user: Usuario = Depends(get_current_user)) -> Usuario:
     """Retorna el usuario autenticado actual."""
+    return current_user
+
+
+@router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
+async def register(
+    payload: RegisterRequest, db: AsyncSession = Depends(get_db)
+) -> LoginResponse:
+    """Registra un estudiante y emite tokens (auto-login)."""
+    if payload.rol == RolEnum.DOCENTE:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_DOCENTE_NO_DISPONIBLE,
+        )
+
+    existing = await db.scalar(select(Usuario).where(Usuario.username == payload.email))
+    if existing is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Ya existe un usuario con ese email",
+        )
+
+    user = Usuario(
+        username=payload.email,
+        hashed_password=get_password_hash(payload.numero_identificacion),
+        nombre_completo=payload.nombre_completo,
+        numero_identificacion=payload.numero_identificacion,
+        rol=payload.rol,
+        cod_upgd=_COD_UPGD_DEMO,
+        activo=True,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
+    return LoginResponse(
+        access_token=create_access_token(user.username),
+        refresh_token=create_refresh_token(user.username),
+        token_type="bearer",
+        usuario=UsuarioOut.model_validate(user),
+    )
+
+
+@router.patch("/me", response_model=UsuarioOut)
+async def update_me(
+    payload: RolUpdateRequest,
+    current_user: Usuario = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Usuario:
+    """Actualiza el rol del usuario autenticado (nunca a DOCENTE)."""
+    if payload.rol == RolEnum.DOCENTE:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_DOCENTE_NO_DISPONIBLE,
+        )
+
+    current_user.rol = payload.rol
+    await db.commit()
+    await db.refresh(current_user)
     return current_user

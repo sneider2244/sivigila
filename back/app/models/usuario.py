@@ -33,6 +33,7 @@ class Usuario(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     nombre_completo: Mapped[str] = mapped_column(String(150), nullable=False)
+    numero_identificacion: Mapped[str | None] = mapped_column(String(20), nullable=True)
     rol: Mapped[RolEnum] = mapped_column(
         SQLEnum(RolEnum, name="rol_enum"), nullable=False, default=RolEnum.UPGD
     )

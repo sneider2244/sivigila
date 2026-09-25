@@ -48,7 +48,7 @@
 
 Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos en FLOW_PLAN.md.
 
-- [ ] **FP1** (back) registro `POST /auth/register` + rol dinámico `PATCH /auth/me` + columna `numero_identificacion`
+- [x] **FP1** (back) registro `POST /auth/register` + rol dinámico `PATCH /auth/me` + columna `numero_identificacion` — ver `docs/reports/FP1-report.md`
 - [ ] **FP2** (back) `GET /docente/estudiantes?q=` + unique constraint asignación + asignar bulk
 - [ ] **FP3** (back) desacople RBAC (crear ficha cualquier rol) + `GET /estudiante/escenarios` (sin datos_esperados) + `POST .../entregar`
 - [ ] **FP4** (front) login dos modos + registro + home con módulos + guard + selector rol
@@ -91,6 +91,7 @@ Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos
 - `2026-09-25` B7 + F6 completos → **Sprint 3 terminado**. Backend: pytest `46 passed`, ruff clean, migración `estados_y_trazabilidad` aplicada; matriz de transiciones (R16). Frontend: lint + build limpios; Actionbar sticky + NavigationTabs + Topbar con logout + modal de búsqueda. Deferred: consistencia `cod_evento` complementaria vs básica (prioridad baja); `_base.scss` `overflow-x: hidden` puede interferir con sticky (revisar).
 - `2026-09-25` B8 + F7 completos. Backend: pytest `52 passed`, ruff clean, migración `modulo_docente` aplicada; evaluación automatizada por comparación de campos planos + `contenido`. Frontend: lint + build limpios, ruta `/docente/escenarios`; corregido shape plano de asignaciones (R17). Deferred: sin unique constraint `(escenario_id, estudiante_id)`; `GET /estudiante/escenarios` no filtra `activo`; `downgrade` de Alembic no dropea el enum (gotcha autogenerate).
 - `2026-09-25` E2E completo → **PROYECTO TERMINADO (4/4 sprints)**. Playwright `5 passed / 0 failed` (health, login render, login submit completo con `docente`/`docente123`, axe en `/login` y `/caracterizacion`). Axe: `0 critical`; **1 serious** `color-contrast` en subtítulo de `/caracterizacion` (4.34 < 4.5) y **1 moderate** `region` (Topbar fuera de landmarks) — quedan para pulido, no bloquean. Flujo de login end-to-end funcionando contra el stack real (Docker + uvicorn + next dev + seed).
+- `2026-09-25` **FP1 completo** (flujo estudiante/docente). Backend: pytest `59 passed`, ruff clean, migración `usuarios_numero_identificacion` aplicada; `POST /auth/register` (auto-login, 409 duplicado, DOCENTE→422) + `PATCH /auth/me` (rol dinámico, DOCENTE→422). Nota: `cod_upgd` del registro apunta a la UPGD demo `"150010123456"` (requiere que exista vía seed; test usa fixture).
 ## Descubrimientos
 
 - **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.

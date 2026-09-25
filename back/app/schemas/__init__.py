@@ -34,6 +34,8 @@ from app.schemas.usuario import (
     LoginRequest,
     LoginResponse,
     RefreshRequest,
+    RegisterRequest,
+    RolUpdateRequest,
     TokenResponse,
     UsuarioOut,
 )
@@ -61,6 +63,8 @@ __all__ = [
     "MunicipioOut",
     "OcupacionOut",
     "RefreshRequest",
+    "RegisterRequest",
+    "RolUpdateRequest",
     "TokenResponse",
     "TrazabilidadOut",
     "UPGDCaracterizacionCreate",
