@@ -1,30 +1,25 @@
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
 *.egg-info/
+.eggs/
+build/
+dist/
+
+# Entorno virtual
+.venv/
+venv/
+
+# Variables de entorno / secretos
+.env
+
+# Testing / herramientas
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-.venv/
-venv/
-env/
-
-# Node / assets
-node_modules/
-
-# Entorno
-.env
-.env.*
-!.env.example
-
-# Base de datos local
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs y temporales
-*.log
-*.tmp
+.coverage
+htmlcov/
 
 # IDE / OS
 .idea/

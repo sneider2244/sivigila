@@ -1,6 +1,7 @@
 services:
-  db:
-    image: postgres:16-alpine
+  postgres:
+    image: postgres:16
+    container_name: sivigila-postgres
     environment:
       POSTGRES_USER: sivigila
       POSTGRES_PASSWORD: sivigila
@@ -8,28 +9,26 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sivigila"]
+      test: ["CMD-SHELL", "pg_isready -U sivigila -d sivigila"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  app:
-    build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      ENV: development
-      DATABASE_URL: postgresql+asyncpg://sivigila:sivigila@db:5432/sivigila
-      SECRET_KEY: dev-secret-change-me
-      SQL_ECHO: "false"
+  redis:
+    image: redis:7
+    container_name: sivigila-redis
     ports:
-      - "8000:8000"
+      - "6379:6379"
     volumes:
-      - .:/app
-    depends_on:
-      db:
-        condition: service_healthy
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  pgdata:
+  postgres_data:
+  redis_data:
