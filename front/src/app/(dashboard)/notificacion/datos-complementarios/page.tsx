@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Controller,
   useForm,
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { createFichaDatosComplementarios } from "@/lib/fichas";
+import { entregarEscenario } from "@/lib/estudiante";
 import type { FichaDatosComplementarios } from "@/types";
 import styles from "./datos-complementarios.module.scss";
 
@@ -175,10 +176,21 @@ function YNChip({
 }
 
 function DatosComplementariosForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const fichaBasicaIdParam = searchParams.get("fichaBasicaId");
+  const fichaBasicaIdParam = searchParams.get("ficha_basica_id");
   const parsedId = fichaBasicaIdParam ? Number(fichaBasicaIdParam) : NaN;
   const idFromQuery = Number.isInteger(parsedId) && parsedId > 0 ? parsedId : null;
+
+  const asignacionIdParam = searchParams.get("asignacion_id");
+  const parsedAsignacionId = asignacionIdParam ? Number(asignacionIdParam) : NaN;
+  const asignacionId =
+    Number.isInteger(parsedAsignacionId) && parsedAsignacionId > 0
+      ? parsedAsignacionId
+      : null;
+
+  const codEventoParam = searchParams.get("cod_evento");
+  const codEvento = codEventoParam?.trim() || COD_EVENTO;
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -239,7 +251,7 @@ function DatosComplementariosForm() {
 
     const ficha: FichaDatosComplementarios = {
       fichaBasicaId: values.fichaBasicaId,
-      codEvento: COD_EVENTO,
+      codEvento,
       contenido: {
         datosAccidente: {
           fecha: values.contenido.datosAccidente.fecha,
@@ -277,6 +289,11 @@ function DatosComplementariosForm() {
 
     try {
       await createFichaDatosComplementarios(ficha);
+      if (asignacionId != null) {
+        await entregarEscenario(asignacionId, values.fichaBasicaId);
+        router.replace("/mis-escenarios");
+        return;
+      }
       setSuccess(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -302,7 +319,7 @@ function DatosComplementariosForm() {
         <p className={styles.errorBanner}>
           No se indicó el ID de la ficha básica. Ingresalo en el campo
           correspondiente o accedé con el parámetro{" "}
-          <code>?fichaBasicaId=&#123;id&#125;</code>.
+          <code>?ficha_basica_id=&#123;id&#125;</code>.
         </p>
       )}
 

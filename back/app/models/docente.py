@@ -42,7 +42,7 @@ class EscenarioClinico(Base):
     #   { "cod_evento": "110", "clasificacion_caso": 1, "hospitalizado": false,
     #     "condicion_final": 1, "area_ocurrencia": 3, "sexo": "M",
     #     "contenido": { "fiebre": true, "exantema": false } }
-    datos_esperados: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    datos_esperados: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     activo: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default="true"
     )

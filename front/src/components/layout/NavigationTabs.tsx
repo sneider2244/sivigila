@@ -10,15 +10,6 @@ interface Tab {
   label: string;
 }
 
-const FICHA_TABS: Tab[] = [
-  { href: "/caracterizacion", label: "Caracterización" },
-  { href: "/notificacion/datos-basicos", label: "Datos Básicos" },
-  {
-    href: "/notificacion/datos-complementarios",
-    label: "Datos Complementarios",
-  },
-];
-
 const MIS_ESCENARIOS: Tab = { href: "/mis-escenarios", label: "Mis escenarios" };
 const DOCENTE: Tab = { href: "/docente/escenarios", label: "Docente" };
 
@@ -27,9 +18,7 @@ export function NavigationTabs() {
   const rol = useUserStore((state) => state.user?.rol);
 
   const isDocente = rol === "DOCENTE";
-  const tabs = isDocente
-    ? [DOCENTE, ...FICHA_TABS]
-    : [MIS_ESCENARIOS, ...FICHA_TABS];
+  const tabs = isDocente ? [DOCENTE] : [MIS_ESCENARIOS];
 
   return (
     <nav className={styles.nav} aria-label="Navegación principal">

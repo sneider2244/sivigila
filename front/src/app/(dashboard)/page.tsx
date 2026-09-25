@@ -19,34 +19,14 @@ const MIS_ESCENARIOS: ModuleCard = {
 const GESTION_DOCENTE: ModuleCard = {
   href: "/docente/escenarios",
   title: "Gestión docente",
-  description: "Asignar escenarios y evaluar las respuestas de los estudiantes.",
+  description: "Crear escenarios clínicos y asignarlos a los estudiantes.",
 };
-
-const FICHA_CARDS: ModuleCard[] = [
-  {
-    href: "/caracterizacion",
-    title: "Caracterización",
-    description: "Registro de la información institucional de la UPGD.",
-  },
-  {
-    href: "/notificacion/datos-basicos",
-    title: "Datos Básicos",
-    description: "Notificación de datos básicos de un caso.",
-  },
-  {
-    href: "/notificacion/datos-complementarios",
-    title: "Datos Complementarios",
-    description: "Datos complementarios del evento de interés.",
-  },
-];
 
 export default function HomePage() {
   const user = useUserStore((state) => state.user);
   const isDocente = user?.rol === "DOCENTE";
 
-  const cards = isDocente
-    ? [GESTION_DOCENTE, ...FICHA_CARDS]
-    : [MIS_ESCENARIOS, ...FICHA_CARDS];
+  const cards = isDocente ? [GESTION_DOCENTE] : [MIS_ESCENARIOS];
 
   return (
     <div className={styles.page}>

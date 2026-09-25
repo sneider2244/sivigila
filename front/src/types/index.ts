@@ -526,7 +526,6 @@ export interface EscenarioClinico {
   titulo: string;
   descripcion: string;
   codEvento: string;
-  datosEsperados: unknown;
   activo: boolean;
 }
 
@@ -535,7 +534,6 @@ export interface EscenarioClinicoRaw {
   titulo: string;
   descripcion: string;
   cod_evento: string;
-  datos_esperados: unknown;
   activo: boolean;
 }
 
@@ -547,9 +545,14 @@ export function mapEscenarioClinico(
     titulo: raw.titulo,
     descripcion: raw.descripcion,
     codEvento: raw.cod_evento,
-    datosEsperados: raw.datos_esperados,
     activo: raw.activo,
   };
+}
+
+export interface CatalogoEvento {
+  codigo: string;
+  nombre: string;
+  descripcion: string;
 }
 
 export interface EscenarioAsignacion {
@@ -621,13 +624,6 @@ export function mapEstudianteDocente(
     numeroIdentificacion: raw.numero_identificacion,
     activo: raw.activo,
   };
-}
-
-export interface EvaluacionResult {
-  puntaje: number;
-  aciertos: number;
-  total: number;
-  detalle: unknown;
 }
 
 export type EstadoAsignacion = "ASIGNADO" | "EN_PROGRESO" | "COMPLETADO";

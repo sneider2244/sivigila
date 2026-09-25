@@ -12,7 +12,6 @@ import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { useUserStore } from "@/store/useUserStore";
 import { createFichaDatosBasicos } from "@/lib/fichas";
-import { entregarEscenario } from "@/lib/estudiante";
 import type {
   AreaOcurrencia,
   ClasificacionCaso,
@@ -278,8 +277,14 @@ function DatosBasicosForm() {
     try {
       const fichaCreada = await createFichaDatosBasicos(ficha);
       if (esEntrega && asignacionId != null) {
-        await entregarEscenario(asignacionId, fichaCreada.id);
-        router.replace("/mis-escenarios");
+        const params = new URLSearchParams({
+          asignacion_id: String(asignacionId),
+          ficha_basica_id: String(fichaCreada.id),
+          cod_evento: values.codEvento,
+        });
+        router.replace(
+          `/notificacion/datos-complementarios?${params.toString()}`,
+        );
         return;
       }
       setSuccess(true);

@@ -20,7 +20,7 @@ class EscenarioCreate(BaseModel):
     titulo: str = Field(min_length=1, max_length=200)
     descripcion: str = Field(min_length=1, max_length=2000)
     cod_evento: str = Field(min_length=1, max_length=10)
-    datos_esperados: dict
+    datos_esperados: dict | None = None
     activo: bool = True
 
 
@@ -33,7 +33,7 @@ class EscenarioOut(BaseModel):
     titulo: str
     descripcion: str
     cod_evento: str
-    datos_esperados: dict
+    datos_esperados: dict | None
     activo: bool
     creado_por_id: int
 

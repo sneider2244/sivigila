@@ -8,68 +8,45 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { useUserStore } from "@/store/useUserStore";
 import {
   asignarEscenario,
   createEscenario,
-  evaluarFicha,
   getAsignaciones,
   getEscenarios,
   getEstudiantes,
   getFichaBasica,
 } from "@/lib/docente";
+import { getEventos } from "@/lib/catalogos";
 import type {
   EscenarioAsignacion,
   EscenarioClinico,
   EstudianteDocente,
-  EvaluacionResult,
   FichaDatosBasicosOut,
 } from "@/types";
 import styles from "./escenarios.module.scss";
 
-const escenarioSchema = z
-  .object({
-    titulo: z.string().min(3, "El título debe tener al menos 3 caracteres"),
-    descripcion: z
-      .string()
-      .min(3, "La descripción debe tener al menos 3 caracteres"),
-    codEvento: z.string().min(1, "El código de evento es obligatorio"),
-    datosEsperados: z.string().min(1, "Los datos esperados son obligatorios"),
-    activo: z.boolean(),
-  })
-  .superRefine((data, ctx) => {
-    try {
-      const parsed = JSON.parse(data.datosEsperados);
-      if (
-        typeof parsed !== "object" ||
-        parsed === null ||
-        Array.isArray(parsed)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["datosEsperados"],
-          message: "Los datos esperados deben ser un objeto JSON",
-        });
-      }
-    } catch {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["datosEsperados"],
-        message: "Los datos esperados deben ser un JSON válido",
-      });
-    }
-  });
+const escenarioSchema = z.object({
+  titulo: z.string().min(3, "El título debe tener al menos 3 caracteres"),
+  descripcion: z
+    .string()
+    .min(3, "La descripción debe tener al menos 3 caracteres"),
+  codEvento: z.string().min(1, "El código de evento es obligatorio"),
+  activo: z.boolean(),
+});
 
 type EscenarioFormValues = z.infer<typeof escenarioSchema>;
-
-function formatDetail(detalle: unknown): string {
-  return JSON.stringify(detalle, null, 2);
-}
 
 function EscenarioForm() {
   const queryClient = useQueryClient();
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const { data: eventos = [] } = useQuery({
+    queryKey: ["catalogos", "eventos"],
+    queryFn: getEventos,
+  });
 
   const {
     register,
@@ -83,7 +60,6 @@ function EscenarioForm() {
       titulo: "",
       descripcion: "",
       codEvento: "",
-      datosEsperados: "",
       activo: true,
     },
   });
@@ -98,19 +74,11 @@ function EscenarioForm() {
 
   const onSubmit = (values: EscenarioFormValues) => {
     setSubmitError(null);
-    let datosEsperados: unknown;
-    try {
-      datosEsperados = JSON.parse(values.datosEsperados);
-    } catch {
-      setSubmitError("Los datos esperados deben ser un JSON válido");
-      return;
-    }
     createMutation.mutate(
       {
         titulo: values.titulo,
         descripcion: values.descripcion,
         codEvento: values.codEvento,
-        datosEsperados,
         activo: values.activo,
       },
       {
@@ -150,39 +118,32 @@ function EscenarioForm() {
           htmlFor="descripcion"
           error={errors.descripcion?.message}
         >
-          <Input
+          <textarea
             id="descripcion"
+            className={styles.textarea}
+            rows={4}
             aria-invalid={Boolean(errors.descripcion)}
-            placeholder="Situación clínica que debe resolver el estudiante"
+            placeholder="Situación clínica que debe resolver el estudiante, p. ej. Reporte de fiebre amarilla, menor de 12 años…"
             {...register("descripcion")}
           />
         </Field>
         <Field
-          label="Código de evento"
+          label="Evento"
           htmlFor="codEvento"
           error={errors.codEvento?.message}
         >
-          <Input
+          <Select
             id="codEvento"
             aria-invalid={Boolean(errors.codEvento)}
-            placeholder="Ej. 100"
             {...register("codEvento")}
-          />
-        </Field>
-        <Field
-          label="Datos esperados (JSON)"
-          htmlFor="datosEsperados"
-          error={errors.datosEsperados?.message}
-          hint="Objeto JSON con los valores esperados de la ficha."
-        >
-          <textarea
-            id="datosEsperados"
-            className={styles.textarea}
-            rows={5}
-            aria-invalid={Boolean(errors.datosEsperados)}
-            placeholder='{"clasificacion_caso": 2}'
-            {...register("datosEsperados")}
-          />
+          >
+            <option value="">Seleccione…</option>
+            {eventos.map((evento) => (
+              <option key={evento.codigo} value={evento.codigo}>
+                {evento.nombre} ({evento.codigo})
+              </option>
+            ))}
+          </Select>
         </Field>
         <Controller
           name="activo"
@@ -388,12 +349,6 @@ function EscenarioCard({
       <p className={styles.cardMeta}>
         Evento: <strong>{escenario.codEvento}</strong>
       </p>
-      <details className={styles.jsonDetails}>
-        <summary>Datos esperados</summary>
-        <pre className={styles.json}>
-          {formatDetail(escenario.datosEsperados)}
-        </pre>
-      </details>
       <EstudianteSelector escenario={escenario} />
       <div className={styles.cardActions}>
         <button
@@ -508,41 +463,7 @@ function AsignacionRow({
   asignacion: EscenarioAsignacion;
   numeroIdentificacion: string | null;
 }) {
-  const [result, setResult] = useState<EvaluacionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [verFicha, setVerFicha] = useState(false);
-
-  const evaluarMutation = useMutation({
-    mutationFn: (input: { fichaBasicaId: number; escenarioId: number }) =>
-      evaluarFicha(input.fichaBasicaId, input.escenarioId),
-    onSuccess: (data) => {
-      setResult(data);
-      setError(null);
-    },
-    onError: (err) => {
-      setResult(null);
-      setError(
-        axios.isAxiosError(err)
-          ? (err.response?.data?.detail ?? "No se pudo evaluar la ficha")
-          : "No se pudo evaluar la ficha",
-      );
-    },
-  });
-
-  const handleEvaluar = () => {
-    if (asignacion.fichaBasicaId == null || asignacion.escenarioId == null) {
-      return;
-    }
-    setResult(null);
-    setError(null);
-    evaluarMutation.mutate({
-      fichaBasicaId: asignacion.fichaBasicaId,
-      escenarioId: asignacion.escenarioId,
-    });
-  };
-
-  const puedeEvaluar =
-    asignacion.fichaBasicaId != null && asignacion.escenarioId != null;
 
   return (
     <li className={styles.asignacion}>
@@ -565,28 +486,6 @@ function AsignacionRow({
           Ver ficha
         </button>
       )}
-      {puedeEvaluar && (
-        <button
-          type="button"
-          className={styles.button}
-          onClick={handleEvaluar}
-          disabled={evaluarMutation.isPending}
-        >
-          {evaluarMutation.isPending ? "Evaluando…" : "Evaluar"}
-        </button>
-      )}
-      {result && (
-        <div className={styles.resultado}>
-          <p>
-            Puntaje: <strong>{result.puntaje}</strong>
-          </p>
-          <p>
-            Aciertos: {result.aciertos}/{result.total}
-          </p>
-          <pre className={styles.json}>{formatDetail(result.detalle)}</pre>
-        </div>
-      )}
-      {error && <p className={styles.errorBanner}>{error}</p>}
       {verFicha && asignacion.fichaBasicaId != null && (
         <FichaBasicaModal
           fichaBasicaId={asignacion.fichaBasicaId}

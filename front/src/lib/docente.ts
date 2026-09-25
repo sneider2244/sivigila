@@ -10,7 +10,6 @@ import {
   type EscenarioClinicoRaw,
   type EstudianteDocente,
   type EstudianteDocenteRaw,
-  type EvaluacionResult,
   type FichaDatosBasicosOut,
   type FichaDatosBasicosOutRaw,
 } from "@/types";
@@ -19,7 +18,6 @@ export interface CrearEscenarioInput {
   titulo: string;
   descripcion: string;
   codEvento: string;
-  datosEsperados: unknown;
   activo: boolean;
 }
 
@@ -37,7 +35,6 @@ export async function createEscenario(
     titulo: input.titulo,
     descripcion: input.descripcion,
     cod_evento: input.codEvento,
-    datos_esperados: input.datosEsperados,
     activo: input.activo,
   });
   return mapEscenarioClinico(data);
@@ -78,15 +75,4 @@ export async function getAsignaciones(): Promise<EscenarioAsignacion[]> {
     "/docente/asignaciones",
   );
   return data.map(mapEscenarioAsignacion);
-}
-
-export async function evaluarFicha(
-  fichaBasicaId: number,
-  escenarioId: number,
-): Promise<EvaluacionResult> {
-  const { data } = await api.post<EvaluacionResult>("/docente/evaluar", {
-    ficha_basica_id: fichaBasicaId,
-    escenario_id: escenarioId,
-  });
-  return data;
 }
