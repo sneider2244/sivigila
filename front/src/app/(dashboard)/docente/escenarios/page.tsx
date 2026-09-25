@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,11 +16,15 @@ import {
   evaluarFicha,
   getAsignaciones,
   getEscenarios,
+  getEstudiantes,
+  getFichaBasica,
 } from "@/lib/docente";
 import type {
   EscenarioAsignacion,
   EscenarioClinico,
+  EstudianteDocente,
   EvaluacionResult,
+  FichaDatosBasicosOut,
 } from "@/types";
 import styles from "./escenarios.module.scss";
 
@@ -208,23 +212,33 @@ function EscenarioForm() {
   );
 }
 
-function EscenarioCard({
+function EstudianteSelector({
   escenario,
-  onVerAsignaciones,
 }: {
   escenario: EscenarioClinico;
-  onVerAsignaciones: () => void;
 }) {
   const queryClient = useQueryClient();
-  const [estudianteId, setEstudianteId] = useState("");
+  const [q, setQ] = useState("");
+  const [seleccionados, setSeleccionados] = useState<Set<number>>(
+    () => new Set(),
+  );
   const [asignarError, setAsignarError] = useState<string | null>(null);
   const [asignarSuccess, setAsignarSuccess] = useState(false);
 
+  const {
+    data: estudiantes = [],
+    isLoading: estudiantesLoading,
+    isError: estudiantesError,
+  } = useQuery({
+    queryKey: ["docente", "estudiantes", q],
+    queryFn: () => getEstudiantes(q),
+  });
+
   const asignarMutation = useMutation({
-    mutationFn: (input: { escenarioId: number; estudianteId: number }) =>
-      asignarEscenario(input.escenarioId, input.estudianteId),
+    mutationFn: (estudianteIds: number[]) =>
+      asignarEscenario(escenario.id, estudianteIds),
     onSuccess: () => {
-      setEstudianteId("");
+      setSeleccionados(new Set());
       setAsignarError(null);
       setAsignarSuccess(true);
       queryClient.invalidateQueries({ queryKey: ["docente", "asignaciones"] });
@@ -239,17 +253,125 @@ function EscenarioCard({
     },
   });
 
+  const toggleSeleccion = (id: number) => {
+    setSeleccionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   const handleAsignar = () => {
     setAsignarError(null);
     setAsignarSuccess(false);
-    const id = Number(estudianteId);
-    if (!Number.isInteger(id) || id <= 0) {
-      setAsignarError("Ingrese un ID de estudiante válido");
+    const ids = Array.from(seleccionados);
+    if (ids.length === 0) {
+      setAsignarError("Seleccione al menos un estudiante");
       return;
     }
-    asignarMutation.mutate({ escenarioId: escenario.id, estudianteId: id });
+    asignarMutation.mutate(ids);
   };
 
+  return (
+    <div className={styles.selector}>
+      <div className={styles.selectorSearch}>
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar por nombre, correo o identificación"
+          aria-label={`Buscar estudiantes para ${escenario.titulo}`}
+        />
+      </div>
+
+      {estudiantesLoading && (
+        <p className={styles.banner}>Buscando estudiantes…</p>
+      )}
+      {estudiantesError && (
+        <p className={styles.errorBanner}>No se pudieron cargar los estudiantes.</p>
+      )}
+      {!estudiantesLoading && !estudiantesError && estudiantes.length === 0 && (
+        <p className={styles.banner}>No se encontraron estudiantes.</p>
+      )}
+
+      {estudiantes.length > 0 && (
+        <ul className={styles.estudianteList}>
+          {estudiantes.map((estudiante) => (
+            <EstudianteCheckbox
+              key={estudiante.id}
+              estudiante={estudiante}
+              checked={seleccionados.has(estudiante.id)}
+              onToggle={() => toggleSeleccion(estudiante.id)}
+            />
+          ))}
+        </ul>
+      )}
+
+      <div className={styles.selectorActions}>
+        <button
+          type="button"
+          className={styles.button}
+          onClick={handleAsignar}
+          disabled={asignarMutation.isPending || seleccionados.size === 0}
+        >
+          {asignarMutation.isPending
+            ? "Asignando…"
+            : `Asignar seleccionados (${seleccionados.size})`}
+        </button>
+      </div>
+
+      {asignarError && <p className={styles.errorBanner}>{asignarError}</p>}
+      {asignarSuccess && (
+        <p className={styles.successBanner}>
+          Estudiantes asignados correctamente.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function EstudianteCheckbox({
+  estudiante,
+  checked,
+  onToggle,
+}: {
+  estudiante: EstudianteDocente;
+  checked: boolean;
+  onToggle: () => void;
+}) {
+  const identificacion = estudiante.numeroIdentificacion ?? "—";
+  return (
+    <li className={styles.estudianteItem}>
+      <label className={styles.estudianteLabel}>
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onToggle}
+          aria-label={`Seleccionar a ${estudiante.nombreCompleto}`}
+        />
+        <span className={styles.estudianteInfo}>
+          <span className={styles.estudianteNombre}>
+            {estudiante.nombreCompleto}
+          </span>
+          <span className={styles.estudianteMeta}>
+            {estudiante.username} · CC {identificacion}
+          </span>
+        </span>
+      </label>
+    </li>
+  );
+}
+
+function EscenarioCard({
+  escenario,
+  onVerAsignaciones,
+}: {
+  escenario: EscenarioClinico;
+  onVerAsignaciones: () => void;
+}) {
   return (
     <article className={styles.card}>
       <div className={styles.cardHeader}>
@@ -272,25 +394,8 @@ function EscenarioCard({
           {formatDetail(escenario.datosEsperados)}
         </pre>
       </details>
+      <EstudianteSelector escenario={escenario} />
       <div className={styles.cardActions}>
-        <div className={styles.assign}>
-          <Input
-            type="number"
-            min={1}
-            value={estudianteId}
-            onChange={(e) => setEstudianteId(e.target.value)}
-            placeholder="ID estudiante"
-            aria-label={`ID de estudiante para ${escenario.titulo}`}
-          />
-          <button
-            type="button"
-            className={styles.button}
-            onClick={handleAsignar}
-            disabled={asignarMutation.isPending}
-          >
-            {asignarMutation.isPending ? "Asignando…" : "Asignar"}
-          </button>
-        </div>
         <button
           type="button"
           className={styles.buttonGhost}
@@ -299,19 +404,113 @@ function EscenarioCard({
           Ver asignaciones
         </button>
       </div>
-      {asignarError && <p className={styles.errorBanner}>{asignarError}</p>}
-      {asignarSuccess && (
-        <p className={styles.successBanner}>
-          Estudiante asignado correctamente.
-        </p>
-      )}
     </article>
   );
 }
 
-function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
+function FichaBasicaModal({
+  fichaBasicaId,
+  onClose,
+}: {
+  fichaBasicaId: number;
+  onClose: () => void;
+}) {
+  const {
+    data: ficha,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["ficha", "datos-basicos", fichaBasicaId],
+    queryFn: () => getFichaBasica(fichaBasicaId),
+  });
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ficha-modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className={styles.modalHeader}>
+          <h2 className={styles.modalTitle} id="ficha-modal-title">
+            Ficha de datos básicos
+          </h2>
+          <button
+            type="button"
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </header>
+        <div className={styles.modalBody}>
+          {isLoading && <p className={styles.banner}>Cargando ficha…</p>}
+          {isError && (
+            <p className={styles.errorBanner}>No se pudo cargar la ficha.</p>
+          )}
+          {ficha && <FichaResumen ficha={ficha} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FichaResumen({ ficha }: { ficha: FichaDatosBasicosOut }) {
+  const nombres = [ficha.primerNombre, ficha.segundoNombre]
+    .filter(Boolean)
+    .join(" ");
+  const apellidos = [ficha.primerApellido, ficha.segundoApellido]
+    .filter(Boolean)
+    .join(" ");
+
+  const filas: { label: string; valor: string }[] = [
+    { label: "Número de identificación", valor: ficha.numId },
+    { label: "Nombres", valor: nombres || "—" },
+    { label: "Apellidos", valor: apellidos || "—" },
+    { label: "Código de evento", valor: ficha.codEvento },
+    { label: "Clasificación de caso", valor: String(ficha.clasificacionCaso) },
+    {
+      label: "Hospitalizado",
+      valor: ficha.hospitalizado ? "Sí" : "No",
+    },
+    { label: "Condición final", valor: String(ficha.condicionFinal) },
+    { label: "Estado", valor: ficha.estado },
+    { label: "Edad", valor: String(ficha.edad) },
+    { label: "Sexo", valor: ficha.sexo },
+    { label: "Fecha de nacimiento", valor: ficha.fNacimiento },
+    { label: "Año", valor: String(ficha.anio) },
+    {
+      label: "Semana epidemiológica",
+      valor: String(ficha.semanaEpidemiologica),
+    },
+    { label: "UPGD", valor: ficha.codUpgd },
+  ];
+
+  return (
+    <dl className={styles.fichaList}>
+      {filas.map((fila) => (
+        <div key={fila.label} className={styles.fichaRow}>
+          <dt className={styles.fichaLabel}>{fila.label}</dt>
+          <dd className={styles.fichaValue}>{fila.valor}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function AsignacionRow({
+  asignacion,
+  numeroIdentificacion,
+}: {
+  asignacion: EscenarioAsignacion;
+  numeroIdentificacion: string | null;
+}) {
   const [result, setResult] = useState<EvaluacionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [verFicha, setVerFicha] = useState(false);
 
   const evaluarMutation = useMutation({
     mutationFn: (input: { fichaBasicaId: number; escenarioId: number }) =>
@@ -334,6 +533,8 @@ function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
     if (asignacion.fichaBasicaId == null || asignacion.escenarioId == null) {
       return;
     }
+    setResult(null);
+    setError(null);
     evaluarMutation.mutate({
       fichaBasicaId: asignacion.fichaBasicaId,
       escenarioId: asignacion.escenarioId,
@@ -351,9 +552,19 @@ function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
         </span>
         <span className={styles.asignacionEstudiante}>
           {asignacion.estudianteNombre} ({asignacion.estudianteUsername})
+          {numeroIdentificacion ? ` · CC ${numeroIdentificacion}` : ""}
         </span>
         <span className={styles.estado}>{asignacion.estado}</span>
       </div>
+      {asignacion.fichaBasicaId != null && (
+        <button
+          type="button"
+          className={styles.buttonGhost}
+          onClick={() => setVerFicha(true)}
+        >
+          Ver ficha
+        </button>
+      )}
       {puedeEvaluar && (
         <button
           type="button"
@@ -376,6 +587,12 @@ function AsignacionRow({ asignacion }: { asignacion: EscenarioAsignacion }) {
         </div>
       )}
       {error && <p className={styles.errorBanner}>{error}</p>}
+      {verFicha && asignacion.fichaBasicaId != null && (
+        <FichaBasicaModal
+          fichaBasicaId={asignacion.fichaBasicaId}
+          onClose={() => setVerFicha(false)}
+        />
+      )}
     </li>
   );
 }
@@ -405,6 +622,20 @@ export default function DocenteEscenariosPage() {
     queryFn: getAsignaciones,
     enabled: isDocente,
   });
+
+  const { data: estudiantes = [] } = useQuery({
+    queryKey: ["docente", "estudiantes", ""],
+    queryFn: () => getEstudiantes(),
+    enabled: isDocente,
+  });
+
+  const numeroIdentificacionPorEstudiante = useMemo(() => {
+    const map = new Map<number, string | null>();
+    for (const estudiante of estudiantes) {
+      map.set(estudiante.id, estudiante.numeroIdentificacion);
+    }
+    return map;
+  }, [estudiantes]);
 
   const scrollToAsignaciones = () => {
     asignacionesRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -464,7 +695,15 @@ export default function DocenteEscenariosPage() {
         {!asignacionesLoading && !asignacionesError && (
           <ul className={styles.asignacionList}>
             {asignaciones.map((asignacion) => (
-              <AsignacionRow key={asignacion.id} asignacion={asignacion} />
+              <AsignacionRow
+                key={asignacion.id}
+                asignacion={asignacion}
+                numeroIdentificacion={
+                  numeroIdentificacionPorEstudiante.get(asignacion.estudianteId) ??
+                  asignacion.numeroIdentificacion ??
+                  null
+                }
+              />
             ))}
           </ul>
         )}

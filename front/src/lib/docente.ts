@@ -2,11 +2,17 @@ import { api } from "@/lib/axios";
 import {
   mapEscenarioAsignacion,
   mapEscenarioClinico,
+  mapEstudianteDocente,
+  mapFichaDatosBasicosOut,
   type EscenarioAsignacion,
   type EscenarioAsignacionRaw,
   type EscenarioClinico,
   type EscenarioClinicoRaw,
+  type EstudianteDocente,
+  type EstudianteDocenteRaw,
   type EvaluacionResult,
+  type FichaDatosBasicosOut,
+  type FichaDatosBasicosOutRaw,
 } from "@/types";
 
 export interface CrearEscenarioInput {
@@ -39,11 +45,32 @@ export async function createEscenario(
 
 export async function asignarEscenario(
   escenarioId: number,
-  estudianteId: number,
-): Promise<void> {
-  await api.post(`/docente/escenarios/${escenarioId}/asignar`, {
-    estudiante_id: estudianteId,
-  });
+  estudianteIds: number[],
+): Promise<EscenarioAsignacion[]> {
+  const { data } = await api.post<EscenarioAsignacionRaw[]>(
+    `/docente/escenarios/${escenarioId}/asignar`,
+    { estudiante_ids: estudianteIds },
+  );
+  return data.map(mapEscenarioAsignacion);
+}
+
+export async function getEstudiantes(
+  q?: string,
+): Promise<EstudianteDocente[]> {
+  const { data } = await api.get<EstudianteDocenteRaw[]>(
+    "/docente/estudiantes",
+    { params: q ? { q } : undefined },
+  );
+  return data.map(mapEstudianteDocente);
+}
+
+export async function getFichaBasica(
+  id: number,
+): Promise<FichaDatosBasicosOut> {
+  const { data } = await api.get<FichaDatosBasicosOutRaw>(
+    `/fichas/datos-basicos/${id}`,
+  );
+  return mapFichaDatosBasicosOut(data);
 }
 
 export async function getAsignaciones(): Promise<EscenarioAsignacion[]> {
