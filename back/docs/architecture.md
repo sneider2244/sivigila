@@ -9,8 +9,27 @@ App de escritorio monolítica en Python:
 - `database.py` (536 líneas) — esquema SQLite, seeds, hashing y CRUD.
 - `sivigila.db` — SQLite local, versionado por error.
 
-Problemas: sin tests, sin migraciones, SQL armado desde `dict.keys()`, magic
-strings, y la UI y el dominio acoplados. No soporta multiusuario en red.
+Hallazgos concretos:
+
+1. **God-file de UI**: `app.py` (1145 líneas), todas las pantallas en un
+   archivo. `IndividualFrame` sola hace 3 tabs + validación + persistencia.
+2. **Cero tests.**
+3. **Lógica de negocio dentro de widgets**: reglas ("Terminada"), validaciones
+   y permisos viven en el frame. Imposible de testear o reusar.
+4. **SQL dinámico desde dicts** (`database.py:426`, `433`, `456`, `468`):
+   `", ".join(f"{k} = ?" for k in data)`. Un typo en una key = crash silencioso.
+5. **Sin migraciones**: `_seed_eventos` (`database.py:397`) solo corre si la
+   tabla está vacía. Agregar un evento no hace nada en una DB existente.
+6. **`sivigila.db` versionado en git** (con hashes de credenciales).
+7. **Credenciales por defecto hardcodeadas** (`database.py:200`): `Admin123!`.
+8. **Basura de generación**: `xxx`/`xxxxxx` en el docstring (`app.py:13-17`),
+   `self.frames = {}` sin uso (`app.py:87`).
+9. **Magic strings**: `"Terminada"`, `"super_admin"`, `"En proceso"`.
+10. **Fechas sin validar**: todas como texto libre `AAAA-MM-DD`.
+
+En resumen: UI y dominio acoplados, sin tests, sin migraciones y sin soporte
+multiusuario en red. La lógica de permisos, en cambio, está bien diseñada y se
+reutiliza.
 
 ## Arquitectura objetivo
 
@@ -72,7 +91,7 @@ sivigila/
 | ORM | SQLAlchemy 2.0 | Modelos tipados, fin del SQL por `dict.keys()`. |
 | Migraciones | Alembic | Hoy agregar un evento no hace nada en una DB existente; Alembic lo resuelve. |
 | Auth | Sesión + cookie + CSRF | Server-rendered con formularios; más simple y seguro que JWT. |
-| Deploy | Docker + VPS | Compose: app + Postgres + nginx. Reproducible. |
+| Deploy | Docker + Oracle Cloud Always Free | Compose: app + Postgres + Caddy (TLS). Corre en VM ARM always-free. |
 
 ## Modelo de datos
 

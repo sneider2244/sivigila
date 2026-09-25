@@ -9,6 +9,9 @@ __pycache__/
 venv/
 env/
 
+# Node / assets
+node_modules/
+
 # Entorno
 .env
 .env.*

@@ -1,0 +1,12 @@
+{
+  "name": "sivigila-assets",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "css:build": "sass app/web/static/scss/app.scss app/web/static/css/app.css --style=compressed --no-source-map",
+    "css:watch": "sass --watch app/web/static/scss/app.scss:app/web/static/css/app.css --style=expanded"
+  },
+  "devDependencies": {
+    "sass": "^1.83.0"
+  }
+}
