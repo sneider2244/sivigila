@@ -24,6 +24,13 @@
 - [x] **F1** Reorganización `src/` + SCSS + deps + stores/lib/types — ver `docs/reports/F1-report.md`
 - [x] **F2** Módulo de Autenticación (login page, useAuth, Zustand session, TanStack Query) — ver `docs/reports/F2-report.md`
 
+## Sprint 2 — Caracterización UPGD y Notificación Individual Básica
+
+- [x] **B4** CRUD Caracterización UPGD (modelo + FK Usuario + endpoints + RBAC) — ver `docs/reports/B4-report.md`
+- [ ] **B5** CRUD Notificación Individual - Datos Básicos (modelo FichaDatosBasicos + endpoints + RBAC)
+- [x] **F3** Formulario responsivo Caracterización UPGD — ver `docs/reports/F3-report.md`
+- [ ] **F4** Formulario Datos Básicos con validaciones dependientes
+
 ## Rulings (decisiones tomadas en nombre del usuario)
 
 - **R1** ~~No se commitea sin pedido explícito~~ SUPERSEDIDO por R6 (el usuario autorizó commitear). (Coste si falla: perdida de granularidad de rollback en git.)
@@ -37,9 +44,17 @@
 - **R9** RBAC como dependency factory `require_roles(*roles)`, no la clase `RequiereRol` del doc (su patrón `Depends` en `__call__` no funciona bien en FastAPI). Mismo detalle 403. (Coste: desviación de implementación, semántica idéntica.)
 - **R10** Contrato de login: backend devuelve `{ access_token, refresh_token, token_type, usuario }` (snake_case, `id` int). Frontend mapea a tipos camelCase. Se corrigió mismatch `user`→`usuario` y `id` string→number en `front/src/lib/auth.ts` + `types/index.ts`. (Coste: ninguno, es la reconciliación correcta.)
 - **R11** Endpoints `/catalogos/*` sin auth (datos de referencia para comboboxes pre-login). (Coste: si luego se requiere restringirlos, hay que agregar dependencia de auth y tests.)
+- **R12** Rol `UI` queda 403 en `/upgd` (la matriz RBAC no le asigna gestión de caracterización; UI solo notifica/transfiere casos). (Coste: si luego UI necesita leer UPGD, agregar permiso.)
+- **R13** No hay naming convention global en `Base.metadata` (las FKs se nombran explícitamente). Evaluar adoptar `naming_convention` en un PR futuro para estabilizar `alembic autogenerate`. (Coste: autogenerate puede proponer renombres si no se cuida.)
 
 ## Progreso
 
 - `2026-09-25` B1 y F1 completos (DONE, auto-verificados). Backend: health `{"status":"ok"}`, pytest `1 passed`, ruff clean, Postgres16+Redis7 healthy vía Docker, `alembic upgrade head` OK. Frontend: lint y `next build` limpios. Gotchas Next 16 registrados en `docs/reports/F1-report.md` (Turbopack, `@use` vs `@import`, `src/app` shadowing, Geist→Inter).
 - `2026-09-25` B2 y F2 completos. Backend: pytest `6 passed`, ruff clean, `alembic upgrade head` (tabla `usuarios` + enum `rol_enum`), login verificado en vivo (200). Frontend: lint + build limpios; contrato de login reconciliado con backend (R10). Quedan 2 warnings no bloqueantes en backend: `SECRET_KEY` default corto (rotar en prod) y ajustes de lint documentados.
 - `2026-09-25` B3 completo → **Sprint 1 terminado**. pytest `13 passed`, ruff clean, migración `catalogos` aplicada, seed idempotente. Sembrado: 33 departamentos, 124 municipios, 19 eventos, 13 ocupaciones, 6 etnias (datos curados, no completos — ampliar sin tocar el seed). Endpoints `/catalogos/*` sin auth (R11).
+- `2026-09-25` B4 + F3 completos. Backend: pytest `21 passed`, ruff clean, migración `upgd_caracterizacion` aplicada + FK `usuarios.cod_upgd` (R7 resuelta). Frontend: lint + build limpios, ruta `/caracterizacion` prerenderizada.
+
+## Descubrimientos
+
+- **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.
+- **Deferred (menor):** los selects departamento/municipio de F3 usan códigos DANE placeholder. Wirear a `/catalogos/departamentos` y `/catalogos/municipios` (ya existen desde B3) en una tarea de pulido.

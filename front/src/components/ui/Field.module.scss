@@ -1,0 +1,23 @@
+@use "../../styles/variables" as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  color: $text;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.hint {
+  color: $text-soft;
+  font-size: 0.75rem;
+}
+
+.error {
+  color: $danger;
+  font-size: 0.8125rem;
+}

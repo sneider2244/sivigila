@@ -1,0 +1,23 @@
+@use "../../styles/variables" as *;
+
+.select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  color: $text;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $primary-soft;
+  }
+
+  &[aria-invalid="true"] {
+    border-color: $danger;
+  }
+}
