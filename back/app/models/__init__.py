@@ -7,6 +7,7 @@ from app.models.ficha_basica import (
     Sexo,
     UndMedEdad,
 )
+from app.models.ficha_complementaria import FichaDatosComplementarios
 from app.models.upgd import NivelComplejidad, UPGDCaracterizacion
 from app.models.usuario import RolEnum, Usuario
 
@@ -18,6 +19,7 @@ __all__ = [
     "Etnia",
     "Evento",
     "FichaDatosBasicos",
+    "FichaDatosComplementarios",
     "Municipio",
     "NivelComplejidad",
     "Ocupacion",
