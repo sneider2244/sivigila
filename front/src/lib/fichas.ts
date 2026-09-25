@@ -1,23 +1,24 @@
 import { api } from "@/lib/axios";
 import {
-  mapFichaDatosBasicos,
+  mapFichaDatosBasicosOut,
   mapFichaDatosBasicosToRaw,
   mapFichaDatosComplementarios,
   mapFichaDatosComplementariosToRaw,
   type FichaDatosBasicos,
-  type FichaDatosBasicosRaw,
+  type FichaDatosBasicosOut,
+  type FichaDatosBasicosOutRaw,
   type FichaDatosComplementarios,
   type FichaDatosComplementariosRaw,
 } from "@/types";
 
 export async function createFichaDatosBasicos(
   ficha: FichaDatosBasicos,
-): Promise<FichaDatosBasicos> {
-  const { data } = await api.post<FichaDatosBasicosRaw>(
+): Promise<FichaDatosBasicosOut> {
+  const { data } = await api.post<FichaDatosBasicosOutRaw>(
     "/fichas/datos-basicos",
     mapFichaDatosBasicosToRaw(ficha),
   );
-  return mapFichaDatosBasicos(data);
+  return mapFichaDatosBasicosOut(data);
 }
 
 export async function createFichaDatosComplementarios(

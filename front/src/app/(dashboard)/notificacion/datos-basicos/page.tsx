@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
 import { useUserStore } from "@/store/useUserStore";
 import { createFichaDatosBasicos } from "@/lib/fichas";
+import { entregarEscenario } from "@/lib/estudiante";
 import type {
   AreaOcurrencia,
   ClasificacionCaso,
@@ -163,7 +165,15 @@ type DatosBasicosFormValues = z.infer<typeof datosBasicosSchema>;
 
 const currentYear = new Date().getFullYear();
 
-export default function DatosBasicosPage() {
+function DatosBasicosForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const asignacionIdParam = searchParams.get("asignacion_id");
+  const codEventoParam = searchParams.get("cod_evento");
+  const asignacionId = asignacionIdParam ? Number(asignacionIdParam) : null;
+  const esEntrega =
+    asignacionId != null && Number.isInteger(asignacionId) && asignacionId > 0;
+
   const user = useUserStore((state) => state.user);
 
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -179,7 +189,7 @@ export default function DatosBasicosPage() {
     defaultValues: {
       codUpgd: user?.codUpgd ?? "",
       subindice: "01",
-      codEvento: "",
+      codEvento: codEventoParam ?? "",
       fGrabacion: "",
       fNotificacion: "",
       anio: currentYear,
@@ -266,7 +276,12 @@ export default function DatosBasicosPage() {
     };
 
     try {
-      await createFichaDatosBasicos(ficha);
+      const fichaCreada = await createFichaDatosBasicos(ficha);
+      if (esEntrega && asignacionId != null) {
+        await entregarEscenario(asignacionId, fichaCreada.id);
+        router.replace("/mis-escenarios");
+        return;
+      }
       setSuccess(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -779,5 +794,13 @@ export default function DatosBasicosPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function DatosBasicosPage() {
+  return (
+    <Suspense fallback={<p className={styles.subtitle}>Cargando…</p>}>
+      <DatosBasicosForm />
+    </Suspense>
   );
 }

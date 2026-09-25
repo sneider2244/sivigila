@@ -267,6 +267,26 @@ export function mapFichaDatosBasicos(
   };
 }
 
+export interface FichaDatosBasicosOutRaw extends FichaDatosBasicosRaw {
+  id: number;
+  creado_por_usuario_id: number | null;
+}
+
+export interface FichaDatosBasicosOut extends FichaDatosBasicos {
+  id: number;
+  creadoPorUsuarioId: number | null;
+}
+
+export function mapFichaDatosBasicosOut(
+  raw: FichaDatosBasicosOutRaw,
+): FichaDatosBasicosOut {
+  return {
+    ...mapFichaDatosBasicos(raw),
+    id: raw.id,
+    creadoPorUsuarioId: raw.creado_por_usuario_id,
+  };
+}
+
 export function mapFichaDatosBasicosToRaw(
   ficha: FichaDatosBasicos,
 ): FichaDatosBasicosRaw {
@@ -574,4 +594,56 @@ export interface EvaluacionResult {
   aciertos: number;
   total: number;
   detalle: unknown;
+}
+
+export type EstadoAsignacion = "ASIGNADO" | "EN_PROGRESO" | "COMPLETADO";
+
+export interface EscenarioEstudiante {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  codEvento: string;
+}
+
+export interface EscenarioEstudianteRaw {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  cod_evento: string;
+}
+
+export interface EstudianteAsignacion {
+  id: number;
+  estado: EstadoAsignacion;
+  fichaBasicaId: number | null;
+  escenario: EscenarioEstudiante;
+}
+
+export interface EstudianteAsignacionRaw {
+  id: number;
+  estado: string;
+  ficha_basica_id: number | null;
+  escenario: EscenarioEstudianteRaw;
+}
+
+export function mapEscenarioEstudiante(
+  raw: EscenarioEstudianteRaw,
+): EscenarioEstudiante {
+  return {
+    id: raw.id,
+    titulo: raw.titulo,
+    descripcion: raw.descripcion,
+    codEvento: raw.cod_evento,
+  };
+}
+
+export function mapEstudianteAsignacion(
+  raw: EstudianteAsignacionRaw,
+): EstudianteAsignacion {
+  return {
+    id: raw.id,
+    estado: raw.estado as EstadoAsignacion,
+    fichaBasicaId: raw.ficha_basica_id,
+    escenario: mapEscenarioEstudiante(raw.escenario),
+  };
 }
