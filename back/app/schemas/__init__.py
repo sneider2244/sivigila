@@ -1,3 +1,10 @@
+from app.schemas.catalogo import (
+    DepartamentoOut,
+    EtniaOut,
+    EventoOut,
+    MunicipioOut,
+    OcupacionOut,
+)
 from app.schemas.usuario import (
     LoginRequest,
     LoginResponse,
@@ -7,8 +14,13 @@ from app.schemas.usuario import (
 )
 
 __all__ = [
+    "DepartamentoOut",
+    "EtniaOut",
+    "EventoOut",
     "LoginRequest",
     "LoginResponse",
+    "MunicipioOut",
+    "OcupacionOut",
     "RefreshRequest",
     "TokenResponse",
     "UsuarioOut",

@@ -20,7 +20,7 @@
 
 - [x] **B1** Scaffold FastAPI + infra (Docker Postgres/Redis, Alembic, config, health) — ver `docs/reports/B1-report.md`
 - [x] **B2** Modelo Usuario + RolEnum + RBAC + JWT auth (login, refresh, RequiereRol) — ver `docs/reports/B2-report.md`
-- [ ] **B3** Catálogos oficiales (modelos + seed DIVIPOLA/eventos + endpoints)
+- [x] **B3** Catálogos oficiales (modelos + seed DIVIPOLA/eventos + endpoints) — ver `docs/reports/B3-report.md`
 - [x] **F1** Reorganización `src/` + SCSS + deps + stores/lib/types — ver `docs/reports/F1-report.md`
 - [x] **F2** Módulo de Autenticación (login page, useAuth, Zustand session, TanStack Query) — ver `docs/reports/F2-report.md`
 
@@ -36,8 +36,10 @@
 - **R8** SQLAlchemy 2.0 estilo moderno (`Mapped`/`mapped_column`), no el `Column` legacy que aparece en `docs/BACKEND_ARCH.md` (paste crudo del spec). (Coste: desviación cosmética del doc.)
 - **R9** RBAC como dependency factory `require_roles(*roles)`, no la clase `RequiereRol` del doc (su patrón `Depends` en `__call__` no funciona bien en FastAPI). Mismo detalle 403. (Coste: desviación de implementación, semántica idéntica.)
 - **R10** Contrato de login: backend devuelve `{ access_token, refresh_token, token_type, usuario }` (snake_case, `id` int). Frontend mapea a tipos camelCase. Se corrigió mismatch `user`→`usuario` y `id` string→number en `front/src/lib/auth.ts` + `types/index.ts`. (Coste: ninguno, es la reconciliación correcta.)
+- **R11** Endpoints `/catalogos/*` sin auth (datos de referencia para comboboxes pre-login). (Coste: si luego se requiere restringirlos, hay que agregar dependencia de auth y tests.)
 
 ## Progreso
 
 - `2026-09-25` B1 y F1 completos (DONE, auto-verificados). Backend: health `{"status":"ok"}`, pytest `1 passed`, ruff clean, Postgres16+Redis7 healthy vía Docker, `alembic upgrade head` OK. Frontend: lint y `next build` limpios. Gotchas Next 16 registrados en `docs/reports/F1-report.md` (Turbopack, `@use` vs `@import`, `src/app` shadowing, Geist→Inter).
 - `2026-09-25` B2 y F2 completos. Backend: pytest `6 passed`, ruff clean, `alembic upgrade head` (tabla `usuarios` + enum `rol_enum`), login verificado en vivo (200). Frontend: lint + build limpios; contrato de login reconciliado con backend (R10). Quedan 2 warnings no bloqueantes en backend: `SECRET_KEY` default corto (rotar en prod) y ajustes de lint documentados.
+- `2026-09-25` B3 completo → **Sprint 1 terminado**. pytest `13 passed`, ruff clean, migración `catalogos` aplicada, seed idempotente. Sembrado: 33 departamentos, 124 municipios, 19 eventos, 13 ocupaciones, 6 etnias (datos curados, no completos — ampliar sin tocar el seed). Endpoints `/catalogos/*` sin auth (R11).

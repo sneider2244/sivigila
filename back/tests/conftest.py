@@ -11,6 +11,7 @@ from sqlalchemy.pool import NullPool
 
 from app.core.database import Base, get_db
 from app.core.security import get_password_hash
+from app.db.seed import seed_catalogos
 from app.main import app
 from app.models.usuario import RolEnum, Usuario
 
@@ -60,6 +61,8 @@ async def _setup_database() -> None:
             )
         )
         await session.commit()
+
+    await seed_catalogos(TestSessionFactory)
 
 
 @pytest.fixture(scope="session", autouse=True)
