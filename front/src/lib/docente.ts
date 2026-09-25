@@ -70,9 +70,11 @@ export async function getFichaBasica(
   return mapFichaDatosBasicosOut(data);
 }
 
-export async function getAsignaciones(): Promise<EscenarioAsignacion[]> {
+export async function getAsignacionesPorEscenario(
+  escenarioId: number,
+): Promise<EscenarioAsignacion[]> {
   const { data } = await api.get<EscenarioAsignacionRaw[]>(
-    "/docente/asignaciones",
+    `/docente/escenarios/${escenarioId}/asignaciones`,
   );
   return data.map(mapEscenarioAsignacion);
 }

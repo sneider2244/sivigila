@@ -418,7 +418,7 @@ export interface EscenarioAsignacion {
   estudianteId: number;
   estudianteUsername: string;
   estudianteNombre: string;
-  numeroIdentificacion: string | null;
+  estudianteNumeroIdentificacion: string | null;
   estado: string;
   fichaBasicaId: number | null;
 }
@@ -430,7 +430,7 @@ export interface EscenarioAsignacionRaw {
   estudiante_id: number;
   estudiante_username: string;
   estudiante_nombre: string;
-  numero_identificacion?: string | null;
+  estudiante_numero_identificacion: string | null;
   estado: string;
   ficha_basica_id: number | null;
 }
@@ -445,7 +445,7 @@ export function mapEscenarioAsignacion(
     estudianteId: raw.estudiante_id,
     estudianteUsername: raw.estudiante_username,
     estudianteNombre: raw.estudiante_nombre,
-    numeroIdentificacion: raw.numero_identificacion ?? null,
+    estudianteNumeroIdentificacion: raw.estudiante_numero_identificacion ?? null,
     estado: raw.estado,
     fichaBasicaId: raw.ficha_basica_id,
   };

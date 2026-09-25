@@ -1,0 +1,108 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1rem 1rem;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  background: $surface;
+  border-radius: $radius;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border;
+}
+
+.modalTitle {
+  color: $text;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.modalClose {
+  width: 2rem;
+  height: 2rem;
+  color: $text-soft;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $bg;
+  }
+}
+
+.modalBody {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+}
+
+.fichaSections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fichaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem 1.5rem;
+
+  @include responsive(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fichaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.fichaLabel {
+  color: $text-soft;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fichaValue {
+  color: $text;
+  font-size: 0.875rem;
+}
+
+.banner {
+  color: $text-soft;
+  font-size: 0.875rem;
+}
+
+.errorBanner {
+  padding: 0.75rem 1rem;
+  color: $danger;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
