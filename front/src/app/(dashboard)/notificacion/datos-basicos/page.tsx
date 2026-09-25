@@ -262,6 +262,7 @@ export default function DatosBasicosPage() {
       clasificacionCaso: values.clasificacionCaso as ClasificacionCaso,
       hospitalizado: values.hospitalizado,
       condicionFinal: values.condicionFinal as CondicionFinal,
+      estado: "NOTIFICADA",
     };
 
     try {

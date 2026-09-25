@@ -1,0 +1,71 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 56px;
+  padding: 0 1.5rem;
+  background: $primary;
+  color: $surface;
+
+  @include responsive(sm) {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.brand {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-right: auto;
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.meta {
+  color: $primary-soft;
+  font-size: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  padding: 0.5rem 0.875rem;
+  color: $primary;
+  background: $surface;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: $primary-soft;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent-yellow;
+    outline-offset: 2px;
+  }
+}

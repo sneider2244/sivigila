@@ -1,0 +1,9 @@
+@use "../../styles/variables" as *;
+
+.actionbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: $surface;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}

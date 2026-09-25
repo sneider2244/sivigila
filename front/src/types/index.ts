@@ -112,6 +112,12 @@ export interface GruposPoblacionales {
   certificado: string | null;
 }
 
+export type EstadoFicha =
+  | "NOTIFICADA"
+  | "EN_AJUSTE"
+  | "CONFIRMADA"
+  | "DESCARTADA";
+
 export interface FichaDatosBasicos {
   codUpgd: string;
   subindice: string;
@@ -141,6 +147,7 @@ export interface FichaDatosBasicos {
   clasificacionCaso: ClasificacionCaso;
   hospitalizado: boolean;
   condicionFinal: CondicionFinal;
+  estado: EstadoFicha;
 }
 
 export interface GruposPoblacionalesRaw {
@@ -182,6 +189,7 @@ export interface FichaDatosBasicosRaw {
   clasificacion_caso: ClasificacionCaso;
   hospitalizado: boolean;
   condicion_final: CondicionFinal;
+  estado: EstadoFicha;
 }
 
 export function mapGruposPoblacionales(
@@ -244,6 +252,7 @@ export function mapFichaDatosBasicos(
     clasificacionCaso: raw.clasificacion_caso,
     hospitalizado: raw.hospitalizado,
     condicionFinal: raw.condicion_final,
+    estado: raw.estado,
   };
 }
 
@@ -281,6 +290,7 @@ export function mapFichaDatosBasicosToRaw(
     clasificacion_caso: ficha.clasificacionCaso,
     hospitalizado: ficha.hospitalizado,
     condicion_final: ficha.condicionFinal,
+    estado: ficha.estado,
   };
 }
 
