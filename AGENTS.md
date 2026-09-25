@@ -31,11 +31,13 @@ Next.js (SSR, SCSS, React Hook Form)  →  FastAPI (JWT, RBAC, Pydantic)  →  P
 
 - Dev: `npm run dev` · Lint: `npm run lint` · Build: `npm run build`
 
-### `back/` (proyecto aún sin scaffold — ver `docs/PROJECT_PLAN.md` Sprint 1)
+### `back/`
 
 - Dev: `uvicorn app.main:app --reload`
 - Tests: `pytest` · Lint: `ruff check .` · Formato: `ruff format .`
 - Migraciones: `alembic upgrade head` / `alembic revision --autogenerate -m "..."`
+- Seed (idempotente: usuario DOCENTE + catálogos + UPGD demo): `python -m app.db.seed`
+- Limpieza de datos demo (borra fichas/escenarios/asignaciones/estudiantes; conserva catálogos, UPGD demo y DOCENTE): `python -m app.db.clean`
 
 ## Convenciones de arquitectura (obligatorias)
 
