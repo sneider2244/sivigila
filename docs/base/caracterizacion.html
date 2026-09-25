@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caracterización de UPGD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="caracterizacion.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="logo-unisangil.png" alt="Logo Unisangil">
+        </span>
+        <div>
+          <h1>Caracterización de UPGD</h1>
+          <p>Módulo de registro y caracterización institucional</p>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab active">Pag1</button>
+        <button class="tab">Pag2</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">01</span>
+        <div>
+          <h2>Datos del registro</h2>
+          <p>Identificación única y fechas clave de la caracterización</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="codPrestador">Cód. Prestador</label>
+          <input type="text" id="codPrestador" value="68000000001">
+        </div>
+        <div class="field field-sm">
+          <label for="subindice">Subíndice</label>
+          <input type="text" id="subindice" value="01">
+        </div>
+        <div class="field">
+          <label for="fCaracteriza">F. Caracterización</label>
+          <input type="text" id="fCaracteriza" value="12/03/2024">
+        </div>
+        <div class="field">
+          <label for="fInicioSivigila">Fecha inicio uso SIVIGILA</label>
+          <input type="text" id="fInicioSivigila" value="15/03/2025">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">02</span>
+        <div>
+          <h2>Caracterización de la UPGD</h2>
+          <p>Datos generales y de identificación de la institución</p>
+        </div>
+      </div>
+
+      <h3 class="subhead">Identificación de la institución</h3>
+
+      <div class="grid">
+        <div class="field">
+          <label for="razonSocial">Razón Social</label>
+          <input type="text" id="razonSocial" value="HOSPITAL">
+        </div>
+        <div class="field">
+          <label for="nit">NIT</label>
+          <input type="text" id="nit" value="2546555244">
+        </div>
+        <div class="field">
+          <label for="direccion">Dirección</label>
+          <input type="text" id="direccion" value="CRA 4 6-31">
+        </div>
+        <div class="field">
+          <label for="representante">Representante Legal</label>
+          <input type="text" id="representante" value="ANDREA CORZO">
+        </div>
+        <div class="field">
+          <label for="correo">Correo Electrónico</label>
+          <input type="email" id="correo" value="ANDREACORZO@GMAIL.COM">
+        </div>
+        <div class="field">
+          <label for="responsable">Responsable de la Notificación</label>
+          <input type="text" id="responsable" value="ANDREA CORZO">
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" value="3212554548">
+        </div>
+        <div class="field">
+          <label for="fConstitucion">Fecha de Constitución o Inicio de Actividades Asistenciales</label>
+          <input type="text" id="fConstitucion" value="12/04/1996">
+        </div>
+      </div>
+
+      <div class="options-row">
+        <div class="field">
+          <label for="naturaleza">Naturaleza Jurídica</label>
+          <select id="naturaleza" name="naturaleza">
+            <option value="1">1 · Privada sin ánimo de lucro</option>
+            <option value="2">2 · Privada con ánimo de lucro</option>
+            <option value="3">3 · Mixta</option>
+            <option value="4" selected>4 · Pública</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="complejidad">Nivel de Complejidad</label>
+          <select id="complejidad" name="complejidad">
+            <option value="1" selected>1 · I Nivel</option>
+            <option value="2">2 · II Nivel</option>
+            <option value="3">3 · III Nivel</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 class="subhead">Información adicional de la UPGD</h3>
+
+      <div class="grid grid-codes">
+        <div class="field field-xs">
+          <label for="tipoUnidad">Tipo de unidad</label>
+          <input type="text" id="tipoUnidad" value="2">
+        </div>
+        <div class="field field-xs">
+          <label for="estado">Estado</label>
+          <input type="text" id="estado" value="1">
+        </div>
+        <div class="field">
+          <label for="localidad">Localidad o Zona</label>
+          <input type="text" id="localidad" value="NA">
+        </div>
+        <div class="field field-xs">
+          <label for="notifIAD">Notificación IAD</label>
+          <input type="text" id="notifIAD" value="2">
+        </div>
+        <div class="field field-xs">
+          <label for="notifISO">Notificación ISO</label>
+          <input type="text" id="notifISO" value="2">
+        </div>
+        <div class="field field-xs">
+          <label for="notifCAB">Notificación CAB</label>
+          <input type="text" id="notifCAB" value="2">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">03</span>
+        <div>
+          <h2>Recursos adicionales para la vigilancia epidemiológica</h2>
+          <p>Disponibilidad de recursos y canales de comunicación</p>
+        </div>
+      </div>
+
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Unidad de análisis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rUnidadAnalisis" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rUnidadAnalisis"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>COVE</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rCove" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rCove"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Talento humano disponible</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rTalentoHumano" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rTalentoHumano"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Tecnología disponible</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rTecnologia" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rTecnologia"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Computador</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rComputador" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rComputador"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Fax Módem</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rFaxModem" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rFaxModem"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Correo electrónico</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rCorreo" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rCorreo"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Internet</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rInternet" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rInternet"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>TeleFax</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rTelefax" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rTelefax"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Radio Teléfono</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="rRadioTelefono" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="rRadioTelefono"><span>No</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-activa">
+      <div class="activa-inner">
+        <div class="activa-label">
+          <span class="sec-badge sec-badge-yellow">04</span>
+          <div>
+            <h2>¿UPGD activa en el SIVIGILA?</h2>
+            <p>Estado actual de la unidad en el sistema</p>
+          </div>
+        </div>
+        <div class="activa-controls">
+          <div class="yn yn-lg">
+            <label class="chip-sm"><input type="radio" name="upgdActiva" checked><span>1 · Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="upgdActiva"><span>2 · No</span></label>
+          </div>
+          <label class="check-inline">
+            <input type="checkbox" checked>
+            <span>Registro confirmado</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <div class="save-card">
+      <div>
+        <h2>¿Listo para guardar?</h2>
+        <p>Verifique la información antes de guardar el registro de caracterización.</p>
+      </div>
+      <button class="btn-save">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="actionbar">
+    <div class="actionbar-inner">
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nueva
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Actualizar
+      </button>
+      <button class="btn btn-ghost btn-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Salir
+      </button>
+      <button class="btn btn-ghost" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        UCI
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Talento Humano / Servicios
+      </button>
+      <button class="btn btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Buscar
+      </button>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datos Complementarios SIVIGILA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="caracterizacion.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="logo-unisangil.png" alt="Logo Unisangil">
+        </span>
+        <div>
+          <h1>DATOS COMPLEMENTARIOS EXISTENTES</h1>
+          <p>Relación con datos básicos · UPGD 680000000001 HOSPITAL</p>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab">Pag1</button>
+        <button class="tab active">Pag2</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">01</span>
+        <div>
+          <h2>Identificación del Paciente</h2>
+          <p>Relación con datos básicos del caso notificado</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field field-span-2">
+          <label for="identificacion">Identificación</label>
+          <div class="field-duo">
+            <select id="identificacion" name="identificacion">
+              <option value="CC" selected>CC</option>
+              <option value="TI">TI</option>
+              <option value="RC">RC</option>
+              <option value="PA">PA</option>
+            </select>
+            <input type="text" value="1095700015">
+          </div>
+        </div>
+        <div class="field">
+          <label for="primerNombre">Primer Nombre</label>
+          <input type="text" id="primerNombre" value="MARIA">
+        </div>
+        <div class="field">
+          <label for="segundoNombre">Segundo Nombre</label>
+          <input type="text" id="segundoNombre" value="CATALINA">
+        </div>
+        <div class="field">
+          <label for="primerApellido">Primer Apellido</label>
+          <input type="text" id="primerApellido" value="FERRI">
+        </div>
+        <div class="field">
+          <label for="segundoApellido">Segundo Apellido</label>
+          <input type="text" id="segundoApellido" value="SANCHEZ">
+        </div>
+        <div class="field">
+          <label for="fNotificacion">F. Notificación</label>
+          <input type="text" id="fNotificacion" class="mask" placeholder="__/__/____" value="21/02/2026">
+        </div>
+        <div class="field field-sm">
+          <label for="anio">Año</label>
+          <input type="text" id="anio" value="2026">
+        </div>
+        <div class="field field-sm">
+          <label for="semana">Semana</label>
+          <input type="text" id="semana" value="7">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">02</span>
+        <div>
+          <h2>Datos del Accidente</h2>
+          <p>Circunstancias y contexto de la exposición al agente</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="fechaAccidente">Fecha accidente</label>
+          <input type="text" id="fechaAccidente" class="mask" placeholder="__/__/____" value="21/02/2026">
+        </div>
+        <div class="field field-span-2">
+          <label for="dirAccidente">Dirección lugar donde ocurrió el accidente</label>
+          <input type="text" id="dirAccidente" value="CRA 23 SUR 9-87">
+        </div>
+        <div class="field field-sm">
+          <label for="actividad">Actividad</label>
+          <select id="actividad" name="actividad">
+            <option value="8" selected>8</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="otraActividad">Otra Actividad</label>
+          <input type="text" id="otraActividad" disabled>
+        </div>
+        <div class="field field-sm">
+          <label for="atencion">Atención</label>
+          <select id="atencion" name="atencion">
+            <option value="6" selected>6</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="otraAtencion">Otra atención</label>
+          <input type="text" id="otraAtencion" disabled>
+        </div>
+        <div class="field field-sm">
+          <label for="practicas">Prácticas nm</label>
+          <select id="practicas" name="practicas">
+            <option value="3" selected>3</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="otraPractica">Otra práctica</label>
+          <input type="text" id="otraPractica" disabled>
+        </div>
+        <div class="field field-sm">
+          <label for="localizacion">Localización</label>
+          <select id="localizacion" name="localizacion">
+            <option value="3" selected>3</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="evidenciaHC">Evidencia HC</label>
+          <select id="evidenciaHC" name="evidenciaHC">
+            <option value="1" selected>1</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="vioSerp">Vió la Serp</label>
+          <select id="vioSerp" name="vioSerp">
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="seCapturo">Se capturó?</label>
+          <select id="seCapturo" name="seCapturo">
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="agenteAgrId">Agente Agr ID</label>
+          <select id="agenteAgrId" name="agenteAgrId">
+            <option value="9" selected>9</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="cualOtroId">Cuál otro?</label>
+          <input type="text" id="cualOtroId" disabled>
+        </div>
+        <div class="field field-sm">
+          <label for="agenteAgr">Agente Agr.</label>
+          <select id="agenteAgr" name="agenteAgr">
+            <option value="17" selected>17</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="cualOtroAg">Cuál otro?</label>
+          <input type="text" id="cualOtroAg" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">03</span>
+        <div>
+          <h2>Cuadro Clínico — Manifestaciones Locales</h2>
+          <p>Signos y síntomas en el sitio de la lesión</p>
+        </div>
+      </div>
+
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Edema</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locEdema" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locEdema"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Dolor</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locDolor" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locDolor"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Eritema</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locEritema"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locEritema" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Flictenas</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locFlictenas"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locFlictenas" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Parestesias</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locParestesias"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locParestesias" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Equimosis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locEquimosis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locEquimosis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hematomas</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locHematomas" checked><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locHematomas"><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Otro</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="locOtro"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="locOtro" checked><span>No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 16px;">
+        <div class="field cond">
+          <label for="cualOtroLocal">Cuál otro?</label>
+          <input type="text" id="cualOtroLocal" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">04</span>
+        <div>
+          <h2>Cuadro Clínico — Manifestaciones Sistémicas</h2>
+          <p>Signos y síntomas generales del cuadro clínico</p>
+        </div>
+      </div>
+
+      <h3 class="subhead">Generales</h3>
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Náuseas</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisNauseas"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisNauseas" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Vómito</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisVomito"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisVomito" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Sialorrea</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisSialorrea"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisSialorrea" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Diarrea</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisDiarrea"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisDiarrea" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Bradicardia</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisBradicardia"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisBradicardia" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hipotensión</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisHipotension"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisHipotension" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Dolor abdom</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisDolorAbdom"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisDolorAbdom" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Fascies</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisFascies"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisFascies" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Alt_vis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisAltVis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisAltVis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Alt_sen</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisAltSen"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisAltSen" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Deb_mus</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisDebMus"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisDebMus" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Oliguria</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisOliguria"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisOliguria" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Cianosis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="sisCianosis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="sisCianosis" checked><span>No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Hemorrágicas y neurológicas</h3>
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Epistaxis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemEpistaxis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemEpistaxis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Gingivorragia</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemGingivorragia"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemGingivorragia" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hematemesis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemHematemesis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemHematemesis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hematuria</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemHematuria"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemHematuria" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hematoq</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemHematoq"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemHematoq" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Vértigo</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemVertigo"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemVertigo" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Pto_palpeb</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemPtoPalpeb"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemPtoPalpeb" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Dif_hablar</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemDifHablar"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemDifHablar" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Disfagia</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemDisfagia"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemDisfagia" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Otro</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hemOtro"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hemOtro" checked><span>No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 16px;">
+        <div class="field cond">
+          <label for="cualOtroSist">Cuál Otro?</label>
+          <input type="text" id="cualOtroSist" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">05</span>
+        <div>
+          <h2>Complicaciones</h2>
+          <p>Complicaciones locales y sistémicas asociadas al evento</p>
+        </div>
+      </div>
+
+      <h3 class="subhead">Complicaciones locales</h3>
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Celulitis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compCelulitis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compCelulitis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Absceso</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compAbsceso"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compAbsceso" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Necrosis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compNecrosis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compNecrosis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Mionecrosis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compMionecrosis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compMionecrosis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Fascritis</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compFascritis"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compFascritis" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Alter_cir</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compAlterCir"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compAlterCir" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Sind. comp.</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compSindComp"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compSindComp" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Otro</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compOtro"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compOtro" checked><span>No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 16px;">
+        <div class="field cond">
+          <label for="cualOtroLocales">Cual Otro? (Locales)</label>
+          <input type="text" id="cualOtroLocales" disabled>
+        </div>
+      </div>
+
+      <h3 class="subhead">Complicaciones sistémicas</h3>
+      <div class="grid-recursos">
+        <div class="recurso">
+          <p>Anemia A</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compAnemia"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compAnemia" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Shock</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compShock"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compShock" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hipo Shock</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compHipoShock"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compHipoShock" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Sép IRA</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compSepIra"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compSepIra" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>CID</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compCid"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compCid" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Hemorrag</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compHemorrag"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compHemorrag" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Edema Cel</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compEdemaCel"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compEdemaCel" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Falla vent</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compFallaVent"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compFallaVent" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Coma</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compComa"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compComa" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="recurso">
+          <p>Otra</p>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="compOtra"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="compOtra" checked><span>No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 16px;">
+        <div class="field field-span-2">
+          <label for="cualOtraComplicacion">Cuál otra complicación?</label>
+          <input type="text" id="cualOtraComplicacion" value="HIPOXIA">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">06</span>
+        <div>
+          <h2>Gravedad</h2>
+          <p>Clasificación de gravedad del cuadro clínico</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field field-sm">
+          <label for="gravedad">Gravedad</label>
+          <select id="gravedad" name="gravedad">
+            <option value="1" selected>1</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">07</span>
+        <div>
+          <h2>Atención Hospitalaria</h2>
+          <p>Tratamiento, suero antiofídico y manejo hospitalario</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field field-sm">
+          <label for="empSuero">Emp suero</label>
+          <select id="empSuero" name="empSuero">
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="tiempoTransc">Tiempo transc</label>
+          <input type="text" id="tiempoTransc" class="mask" placeholder="HH:MM">
+        </div>
+        <div class="field field-sm">
+          <label for="tipoSA">Tipo SA</label>
+          <select id="tipoSA" name="tipoSA">
+            <option value="" selected>—</option>
+          </select>
+        </div>
+        <div class="field field-span-2">
+          <label for="fabricante">Fabricante</label>
+          <select id="fabricante" name="fabricante">
+            <option value="" selected>—</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="cualFabricante">Cuál?</label>
+          <input type="text" id="cualFabricante" disabled>
+        </div>
+        <div class="field">
+          <label for="lote">Lote</label>
+          <input type="text" id="lote">
+        </div>
+        <div class="field field-sm">
+          <label for="reaccApl">Reacc apl</label>
+          <select id="reaccApl" name="reaccApl">
+            <option value="" selected>—</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="dosis">Dosis</label>
+          <input type="text" id="dosis">
+        </div>
+        <div class="field field-sm">
+          <label for="tiempoAdm">Tiempo adm</label>
+          <input type="text" id="tiempoAdm" class="mask" placeholder="HH:MM">
+        </div>
+        <div class="field field-sm">
+          <label for="remitido">Remitido</label>
+          <select id="remitido" name="remitido">
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="ttoQx">Tto. Qx</label>
+          <select id="ttoQx" name="ttoQx">
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="tipoTto">Tipo Tto.</label>
+          <select id="tipoTto" name="tipoTto">
+            <option value="" selected>—</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="actionbar">
+    <div class="actionbar-inner">
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Datos Básicos
+      </button>
+      <button class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Actualizar
+      </button>
+      <button class="btn btn-ghost btn-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Salir
+      </button>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -325,180 +325,27 @@ export function mapFichaDatosBasicosToRaw(
   };
 }
 
-export interface DatosAccidente {
-  fecha: string;
-  direccion: string;
-  agenteAgresor: number;
-}
-
-export interface DatosAccidenteRaw {
-  fecha: string;
-  direccion: string;
-  agente_agresor: number;
-}
-
-export interface ManifestacionesLocales {
-  edema: boolean;
-  dolor: boolean;
-  eritema: boolean;
-  equimosis: boolean;
-  flictenas: boolean;
-  necrosisLocal: boolean;
-}
-
-export interface ManifestacionesLocalesRaw {
-  edema: boolean;
-  dolor: boolean;
-  eritema: boolean;
-  equimosis: boolean;
-  flictenas: boolean;
-  necrosis_local: boolean;
-}
-
-export interface ManifestacionesSistemicas {
-  nauseas: boolean;
-  vomito: boolean;
-  dolorAbdominal: boolean;
-  bradicardia: boolean;
-  hipotension: boolean;
-  sangrado: boolean;
-}
-
-export interface ManifestacionesSistemicasRaw {
-  nauseas: boolean;
-  vomito: boolean;
-  dolor_abdominal: boolean;
-  bradicardia: boolean;
-  hipotension: boolean;
-  sangrado: boolean;
-}
-
-export interface Complicaciones {
-  celulitis: boolean;
-  necrosis: boolean;
-  insuficienciaRenal: boolean;
-  hipoxia: boolean;
-}
-
-export interface ComplicacionesRaw {
-  celulitis: boolean;
-  necrosis: boolean;
-  insuficiencia_renal: boolean;
-  hipoxia: boolean;
-}
-
-export interface AtencionHospitalaria {
-  empleoSuero: number;
-  dosis: number | null;
-}
-
-export interface AtencionHospitalariaRaw {
-  empleo_suero: number;
-  dosis: number | null;
-}
-
-export interface ContenidoOfidico {
-  datosAccidente: DatosAccidente;
-  manifestacionesLocales: ManifestacionesLocales;
-  manifestacionesSistemicas: ManifestacionesSistemicas;
-  complicaciones: Complicaciones;
-  atencionHospitalaria: AtencionHospitalaria;
-}
-
-export interface ContenidoOfidicoRaw {
-  datos_accidente: DatosAccidenteRaw;
-  manifestaciones_locales: ManifestacionesLocalesRaw;
-  manifestaciones_sistemicas: ManifestacionesSistemicasRaw;
-  complicaciones: ComplicacionesRaw;
-  atencion_hospitalaria: AtencionHospitalariaRaw;
-}
+export type ContenidoComplementario = Record<string, unknown>;
 
 export interface FichaDatosComplementarios {
   fichaBasicaId: number;
   codEvento: string;
-  contenido: ContenidoOfidico;
+  contenido: ContenidoComplementario;
 }
 
 export interface FichaDatosComplementariosRaw {
   ficha_basica_id: number;
   cod_evento: string;
-  contenido: ContenidoOfidicoRaw;
+  contenido: ContenidoComplementario;
 }
 
-export function mapContenidoOfidico(
-  raw: ContenidoOfidicoRaw,
-): ContenidoOfidico {
-  return {
-    datosAccidente: {
-      fecha: raw.datos_accidente.fecha,
-      direccion: raw.datos_accidente.direccion,
-      agenteAgresor: raw.datos_accidente.agente_agresor,
-    },
-    manifestacionesLocales: {
-      edema: raw.manifestaciones_locales.edema,
-      dolor: raw.manifestaciones_locales.dolor,
-      eritema: raw.manifestaciones_locales.eritema,
-      equimosis: raw.manifestaciones_locales.equimosis,
-      flictenas: raw.manifestaciones_locales.flictenas,
-      necrosisLocal: raw.manifestaciones_locales.necrosis_local,
-    },
-    manifestacionesSistemicas: {
-      nauseas: raw.manifestaciones_sistemicas.nauseas,
-      vomito: raw.manifestaciones_sistemicas.vomito,
-      dolorAbdominal: raw.manifestaciones_sistemicas.dolor_abdominal,
-      bradicardia: raw.manifestaciones_sistemicas.bradicardia,
-      hipotension: raw.manifestaciones_sistemicas.hipotension,
-      sangrado: raw.manifestaciones_sistemicas.sangrado,
-    },
-    complicaciones: {
-      celulitis: raw.complicaciones.celulitis,
-      necrosis: raw.complicaciones.necrosis,
-      insuficienciaRenal: raw.complicaciones.insuficiencia_renal,
-      hipoxia: raw.complicaciones.hipoxia,
-    },
-    atencionHospitalaria: {
-      empleoSuero: raw.atencion_hospitalaria.empleo_suero,
-      dosis: raw.atencion_hospitalaria.dosis,
-    },
-  };
+export interface FichaDatosComplementariosOut extends FichaDatosComplementarios {
+  id: number;
 }
 
-export function mapContenidoOfidicoToRaw(
-  contenido: ContenidoOfidico,
-): ContenidoOfidicoRaw {
-  return {
-    datos_accidente: {
-      fecha: contenido.datosAccidente.fecha,
-      direccion: contenido.datosAccidente.direccion,
-      agente_agresor: contenido.datosAccidente.agenteAgresor,
-    },
-    manifestaciones_locales: {
-      edema: contenido.manifestacionesLocales.edema,
-      dolor: contenido.manifestacionesLocales.dolor,
-      eritema: contenido.manifestacionesLocales.eritema,
-      equimosis: contenido.manifestacionesLocales.equimosis,
-      flictenas: contenido.manifestacionesLocales.flictenas,
-      necrosis_local: contenido.manifestacionesLocales.necrosisLocal,
-    },
-    manifestaciones_sistemicas: {
-      nauseas: contenido.manifestacionesSistemicas.nauseas,
-      vomito: contenido.manifestacionesSistemicas.vomito,
-      dolor_abdominal: contenido.manifestacionesSistemicas.dolorAbdominal,
-      bradicardia: contenido.manifestacionesSistemicas.bradicardia,
-      hipotension: contenido.manifestacionesSistemicas.hipotension,
-      sangrado: contenido.manifestacionesSistemicas.sangrado,
-    },
-    complicaciones: {
-      celulitis: contenido.complicaciones.celulitis,
-      necrosis: contenido.complicaciones.necrosis,
-      insuficiencia_renal: contenido.complicaciones.insuficienciaRenal,
-      hipoxia: contenido.complicaciones.hipoxia,
-    },
-    atencion_hospitalaria: {
-      empleo_suero: contenido.atencionHospitalaria.empleoSuero,
-      dosis: contenido.atencionHospitalaria.dosis,
-    },
-  };
+export interface FichaDatosComplementariosOutRaw
+  extends FichaDatosComplementariosRaw {
+  id: number;
 }
 
 export function mapFichaDatosComplementarios(
@@ -507,7 +354,7 @@ export function mapFichaDatosComplementarios(
   return {
     fichaBasicaId: raw.ficha_basica_id,
     codEvento: raw.cod_evento,
-    contenido: mapContenidoOfidico(raw.contenido),
+    contenido: raw.contenido,
   };
 }
 
@@ -517,7 +364,16 @@ export function mapFichaDatosComplementariosToRaw(
   return {
     ficha_basica_id: ficha.fichaBasicaId,
     cod_evento: ficha.codEvento,
-    contenido: mapContenidoOfidicoToRaw(ficha.contenido),
+    contenido: ficha.contenido,
+  };
+}
+
+export function mapFichaDatosComplementariosOut(
+  raw: FichaDatosComplementariosOutRaw,
+): FichaDatosComplementariosOut {
+  return {
+    ...mapFichaDatosComplementarios(raw),
+    id: raw.id,
   };
 }
 

@@ -465,34 +465,35 @@
   overflow-y: auto;
 }
 
-.fichaList {
+.fichaSections {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin: 0;
+  gap: 1rem;
 }
 
-.fichaRow {
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid $border;
+.fichaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem 1.5rem;
 
-  &:last-child {
-    border-bottom: none;
+  @include responsive(sm) {
+    grid-template-columns: 1fr;
   }
 }
 
+.fichaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
 .fichaLabel {
-  flex: 0 0 45%;
   color: $text-soft;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
 .fichaValue {
-  flex: 1 1 auto;
   color: $text;
   font-size: 0.875rem;
-  margin: 0;
 }

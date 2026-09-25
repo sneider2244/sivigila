@@ -10,6 +10,7 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { RadioYN } from "@/components/ui/RadioYN";
+import { Section } from "@/components/ui/Section";
 import { useUserStore } from "@/store/useUserStore";
 import {
   asignarEscenario,
@@ -19,6 +20,7 @@ import {
   getEstudiantes,
   getFichaBasica,
 } from "@/lib/docente";
+import { getFichaDatosComplementarios } from "@/lib/fichas";
 import { getEventos } from "@/lib/catalogos";
 import type {
   EscenarioAsignacion,
@@ -379,6 +381,14 @@ function FichaBasicaModal({
     queryFn: () => getFichaBasica(fichaBasicaId),
   });
 
+  const {
+    data: complementaria,
+    isLoading: complementariaLoading,
+  } = useQuery({
+    queryKey: ["ficha", "datos-complementarios", fichaBasicaId],
+    queryFn: () => getFichaDatosComplementarios(fichaBasicaId),
+  });
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div
@@ -406,9 +416,32 @@ function FichaBasicaModal({
           {isError && (
             <p className={styles.errorBanner}>No se pudo cargar la ficha.</p>
           )}
-          {ficha && <FichaResumen ficha={ficha} />}
+          {ficha && (
+            <>
+              <FichaResumen ficha={ficha} />
+              {complementariaLoading && (
+                <p className={styles.banner}>
+                  Cargando datos complementarios…
+                </p>
+              )}
+              {!complementariaLoading && (
+                <DatosComplementariosResumen
+                  contenido={complementaria?.contenido ?? {}}
+                />
+              )}
+            </>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function FichaItem({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div className={styles.fichaItem}>
+      <span className={styles.fichaLabel}>{label}</span>
+      <span className={styles.fichaValue}>{valor}</span>
     </div>
   );
 }
@@ -420,39 +453,123 @@ function FichaResumen({ ficha }: { ficha: FichaDatosBasicosOut }) {
   const apellidos = [ficha.primerApellido, ficha.segundoApellido]
     .filter(Boolean)
     .join(" ");
-
-  const filas: { label: string; valor: string }[] = [
-    { label: "Número de identificación", valor: ficha.numId },
-    { label: "Nombres", valor: nombres || "—" },
-    { label: "Apellidos", valor: apellidos || "—" },
-    { label: "Código de evento", valor: ficha.codEvento },
-    { label: "Clasificación de caso", valor: String(ficha.clasificacionCaso) },
-    {
-      label: "Hospitalizado",
-      valor: ficha.hospitalizado ? "Sí" : "No",
-    },
-    { label: "Condición final", valor: String(ficha.condicionFinal) },
-    { label: "Estado", valor: ficha.estado },
-    { label: "Edad", valor: String(ficha.edad) },
-    { label: "Sexo", valor: ficha.sexo },
-    { label: "Fecha de nacimiento", valor: ficha.fNacimiento },
-    { label: "Año", valor: String(ficha.anio) },
-    {
-      label: "Semana epidemiológica",
-      valor: String(ficha.semanaEpidemiologica),
-    },
-    { label: "UPGD", valor: ficha.codUpgd },
-  ];
+  const identificacion = [ficha.tipoId, ficha.numId].filter(Boolean).join(" ");
+  const sexo =
+    ficha.sexo === "M" ? "Masculino" : ficha.sexo === "F" ? "Femenino" : ficha.sexo;
 
   return (
-    <dl className={styles.fichaList}>
-      {filas.map((fila) => (
-        <div key={fila.label} className={styles.fichaRow}>
-          <dt className={styles.fichaLabel}>{fila.label}</dt>
-          <dd className={styles.fichaValue}>{fila.valor}</dd>
+    <div className={styles.fichaSections}>
+      <Section
+        step="01"
+        title="Identificación"
+        subtitle="Datos personales del paciente"
+      >
+        <div className={styles.fichaGrid}>
+          <FichaItem label="Identificación" valor={identificacion || "—"} />
+          <FichaItem label="Nombres" valor={nombres || "—"} />
+          <FichaItem label="Apellidos" valor={apellidos || "—"} />
+          <FichaItem label="Sexo" valor={sexo} />
+          <FichaItem label="Fecha de nacimiento" valor={ficha.fNacimiento} />
+          <FichaItem label="Edad" valor={String(ficha.edad)} />
         </div>
-      ))}
-    </dl>
+      </Section>
+
+      <Section step="02" title="Evento y notificación">
+        <div className={styles.fichaGrid}>
+          <FichaItem label="Código de evento" valor={ficha.codEvento} />
+          <FichaItem
+            label="Clasificación de caso"
+            valor={String(ficha.clasificacionCaso)}
+          />
+          <FichaItem label="Estado" valor={ficha.estado} />
+          <FichaItem
+            label="Fecha de notificación"
+            valor={ficha.fNotificacion}
+          />
+          <FichaItem label="Año" valor={String(ficha.anio)} />
+          <FichaItem
+            label="Semana epidemiológica"
+            valor={String(ficha.semanaEpidemiologica)}
+          />
+          <FichaItem label="UPGD" valor={ficha.codUpgd} />
+        </div>
+      </Section>
+
+      <Section step="03" title="Datos clínicos">
+        <div className={styles.fichaGrid}>
+          <FichaItem
+            label="Hospitalizado"
+            valor={ficha.hospitalizado ? "Sí" : "No"}
+          />
+          <FichaItem
+            label="Condición final"
+            valor={String(ficha.condicionFinal)}
+          />
+        </div>
+      </Section>
+
+      <Section step="04" title="Ubicación">
+        <div className={styles.fichaGrid}>
+          <FichaItem label="País" valor={ficha.paisOcurrencia} />
+          <FichaItem label="Departamento" valor={ficha.dptoOcurrencia} />
+          <FichaItem label="Municipio" valor={ficha.muniOcurrencia} />
+          <FichaItem
+            label="Área de ocurrencia"
+            valor={String(ficha.areaOcurrencia)}
+          />
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+function humanizarEtiqueta(clave: string): string {
+  const palabras = clave.replace(/_/g, " ").trim();
+  if (!palabras) return clave;
+  return palabras.charAt(0).toUpperCase() + palabras.slice(1);
+}
+
+function formatValorComplementario(valor: unknown): string {
+  if (valor === null || valor === undefined) return "—";
+  if (typeof valor === "boolean") return valor ? "Sí" : "No";
+  if (typeof valor === "number" || typeof valor === "string") {
+    const texto = String(valor).trim();
+    return texto === "" ? "—" : texto;
+  }
+  return JSON.stringify(valor);
+}
+
+function DatosComplementariosResumen({
+  contenido,
+}: {
+  contenido: Record<string, unknown>;
+}) {
+  const entradas = Object.entries(contenido);
+
+  if (entradas.length === 0) {
+    return (
+      <Section step="05" title="Datos complementarios">
+        <p className={styles.banner}>Sin datos complementarios.</p>
+      </Section>
+    );
+  }
+
+  return (
+    <Section
+      step="05"
+      title="Datos complementarios"
+      subtitle="Información complementaria del evento"
+    >
+      <div className={styles.fichaGrid}>
+        {entradas.map(([clave, valor]) => (
+          <FichaItem
+            key={clave}
+            label={humanizarEtiqueta(clave)}
+            valor={formatValorComplementario(valor)}
+          />
+        ))}
+      </div>
+    </Section>
   );
 }
 

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificación Individual SIVIGILA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="caracterizacion.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="logo-unisangil.png" alt="Logo Unisangil">
+        </span>
+        <div>
+          <h1>NOTIFICACION INDIVIDUAL - DATOS BASICOS</h1>
+          <p>UPGD 680000000001 · HOSPITAL</p>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab active">Pag1</button>
+        <button class="tab">Pag2</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">01</span>
+        <div>
+          <h2>Cabecera General</h2>
+          <p>Identificación de la ficha, evento y periodo epidemiológico</p>
+        </div>
+      </div>
+
+      <div class="grid grid-dense">
+        <div class="field field-sm field-readonly">
+          <label for="registros">Registros</label>
+          <input type="text" id="registros" value="21" readonly>
+        </div>
+        <div class="field field-span-2">
+          <label for="codUpgd">Código UPGD</label>
+          <select id="codUpgd" name="codUpgd">
+            <option value="680000000001" selected>680000000001 · HOSPITAL</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="ajuste">Ajuste</label>
+          <input type="text" id="ajuste" value="0">
+        </div>
+        <div class="field">
+          <label for="fGrabacion">F. Grabación</label>
+          <input type="text" id="fGrabacion" class="mask" placeholder="__/__/____" value="12/03/2024">
+        </div>
+        <div class="field field-span-2">
+          <label for="codEvento">Código del Evento</label>
+          <select id="codEvento" name="codEvento">
+            <option value="820" selected>820 · MORTALIDAD PERINATAL Y NEONATAL TARDÍA</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fNotificacion">F. Notificación</label>
+          <input type="text" id="fNotificacion" class="mask" placeholder="__/__/____" value="15/03/2025">
+        </div>
+        <div class="field field-sm">
+          <label for="anio">Año</label>
+          <input type="text" id="anio" value="2025">
+        </div>
+        <div class="field field-sm">
+          <label for="semana">Semana Not Ocu</label>
+          <input type="text" id="semana" value="11">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">02</span>
+        <div>
+          <h2>Identificación del Paciente</h2>
+          <p>Datos personales y de identificación del caso notificado</p>
+        </div>
+      </div>
+
+      <div class="grid grid-dense">
+        <div class="field field-span-2">
+          <label for="tipoId">Tipo y Número de Identificación</label>
+          <div class="field-duo">
+            <select id="tipoId" name="tipoId">
+              <option value="CC" selected>CC</option>
+              <option value="TI">TI</option>
+              <option value="RC">RC</option>
+              <option value="PA">PA</option>
+            </select>
+            <input type="text" id="numId" value="1098765432">
+          </div>
+        </div>
+        <div class="field">
+          <label for="primerNombre">Primer Nombre</label>
+          <input type="text" id="primerNombre" value="JUAN">
+        </div>
+        <div class="field">
+          <label for="segundoNombre">Segundo Nombre</label>
+          <input type="text" id="segundoNombre" value="CARLOS">
+        </div>
+        <div class="field">
+          <label for="primerApellido">Primer Apellido</label>
+          <input type="text" id="primerApellido" value="PEREZ">
+        </div>
+        <div class="field">
+          <label for="segundoApellido">Segundo Apellido</label>
+          <input type="text" id="segundoApellido" value="GOMEZ">
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" value="3101234567">
+        </div>
+        <div class="field">
+          <label for="fNacimiento">F. Nacimiento</label>
+          <input type="text" id="fNacimiento" class="mask" placeholder="__/__/____" value="01/01/1990">
+        </div>
+        <div class="field field-sm">
+          <label for="edad">Edad</label>
+          <input type="text" id="edad" value="35">
+        </div>
+        <div class="field field-sm">
+          <label for="undMed">Und Med</label>
+          <select id="undMed" name="undMed">
+            <option value="1" selected>Años</option>
+            <option value="2">Meses</option>
+            <option value="3">Días</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nacionalidad">Nacionalidad</label>
+          <input type="text" id="nacionalidad" value="COLOMBIA">
+        </div>
+        <div class="field field-sm">
+          <label for="sexo">Sexo</label>
+          <select id="sexo" name="sexo">
+            <option value="M" selected>M</option>
+            <option value="F">F</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="identGenero">Ident. Género</label>
+          <select id="identGenero" name="identGenero">
+            <option value="1" selected>Masculino</option>
+            <option value="2">Femenino</option>
+            <option value="3">Transgénero</option>
+            <option value="4">No binario</option>
+            <option value="5">Otro</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="otraIdentidad">Cuál otra identidad?</label>
+          <input type="text" id="otraIdentidad" disabled>
+        </div>
+        <div class="field">
+          <label for="orientacion">Orientación sex.</label>
+          <select id="orientacion" name="orientacion">
+            <option value="1" selected>Heterosexual</option>
+            <option value="2">Homosexual</option>
+            <option value="3">Bisexual</option>
+            <option value="4">Otra</option>
+          </select>
+        </div>
+        <div class="field cond">
+          <label for="otraOrientacion">Cual otra orientación</label>
+          <input type="text" id="otraOrientacion" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">03</span>
+        <div>
+          <h2>Ubicación y Demografía</h2>
+          <p>Procedencia, ocurrencia y residencia del caso</p>
+        </div>
+      </div>
+
+      <h3 class="subhead">Procedencia / Ocurrencia</h3>
+      <div class="grid grid-dense">
+        <div class="field">
+          <label for="pais">País de Procedencia/Ocurrencia</label>
+          <input type="text" id="pais" value="COLOMBIA">
+        </div>
+        <div class="field field-span-2">
+          <label for="departamento">Departamento de Procedencia/Ocurrencia</label>
+          <input type="text" id="departamento" value="SANTANDER">
+        </div>
+        <div class="field field-span-2">
+          <label for="municipio">Municipio de Procedencia/Ocurrencia</label>
+          <input type="text" id="municipio" value="SAN GIL">
+        </div>
+        <div class="field field-sm">
+          <label for="area">Área Pro /Oc</label>
+          <select id="area" name="area">
+            <option value="1" selected>Cabecera municipal</option>
+            <option value="2">Centro poblado</option>
+            <option value="3">Rural</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="localidad">Localidad</label>
+          <input type="text" id="localidad" value="NA">
+        </div>
+        <div class="field">
+          <label for="centroPoblado">Centro poblado</label>
+          <input type="text" id="centroPoblado" value="NA">
+        </div>
+        <div class="field field-sm">
+          <label for="vereda">Vereda</label>
+          <select id="vereda" name="vereda">
+            <option value="" selected>—</option>
+            <option value="1">1</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nombreVereda">Nombre vereda</label>
+          <input type="text" id="nombreVereda">
+        </div>
+        <div class="field field-sm">
+          <label for="barrio">Barrio</label>
+          <select id="barrio" name="barrio">
+            <option value="" selected>—</option>
+            <option value="1">1</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nombreBarrio">Nombre Barrio</label>
+          <input type="text" id="nombreBarrio">
+        </div>
+      </div>
+
+      <h3 class="subhead">Seguridad social y condición</h3>
+      <div class="grid grid-dense">
+        <div class="field field-sm">
+          <label for="ocupacion">Ocupación</label>
+          <select id="ocupacion" name="ocupacion">
+            <option value="" selected>—</option>
+            <option value="1">1 · Empleado</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="regSalud">Reg Salud</label>
+          <select id="regSalud" name="regSalud">
+            <option value="1">Contributivo</option>
+            <option value="2" selected>Subsidiado</option>
+            <option value="3">Excepción</option>
+            <option value="4">No afiliado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="administradora">Administradora</label>
+          <input type="text" id="administradora" value="NUEVA EPS">
+        </div>
+        <div class="field field-sm">
+          <label for="pEtnica">P Étnica</label>
+          <select id="pEtnica" name="pEtnica">
+            <option value="0" selected>Ninguna</option>
+            <option value="1">Indígena</option>
+            <option value="2">Afrocolombiano</option>
+            <option value="3">ROM</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="grupoEtnico">Grupo étnico</label>
+          <input type="text" id="grupoEtnico">
+        </div>
+        <div class="field field-sm">
+          <label for="estrato">Estrato</label>
+          <select id="estrato" name="estrato">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">04</span>
+        <div>
+          <h2>Grupos Poblacionales</h2>
+          <p>Condiciones y pertenencia a grupos de especial seguimiento</p>
+        </div>
+      </div>
+
+      <div class="grid-checks">
+        <label class="check-chip"><input type="checkbox"><span>Pers. en sit. de discapacidad</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Desplaz.</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Migrante</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Pob. priv. libertad</span></label>
+        <label class="check-chip"><input type="checkbox" checked><span>Gestante</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Habit. calle</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Pob. ICBF</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Madre com.</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Desmovilizado</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Pob. Psiqui</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Víctima viol.</span></label>
+        <label class="check-chip"><input type="checkbox"><span>Otro</span></label>
+        <div class="field field-sm">
+          <label for="semGest">Sem. gest</label>
+          <input type="text" id="semGest" value="24">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <span class="sec-badge">05</span>
+        <div>
+          <h2>Notificación</h2>
+          <p>Datos clínicos, clasificación y responsable de la ficha</p>
+        </div>
+      </div>
+
+      <h3 class="subhead">Datos clínicos</h3>
+      <div class="grid grid-dense">
+        <div class="field field-sm">
+          <label for="fuente">Fuente</label>
+          <select id="fuente" name="fuente">
+            <option value="1" selected>1 · Notificación rutinaria</option>
+            <option value="2">2 · Búsqueda activa</option>
+            <option value="3">3 · Vigilancia centinela</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="lugarResidencia">Lugar de Residencia</label>
+          <input type="text" id="lugarResidencia" value="SAN GIL">
+        </div>
+        <div class="field">
+          <label for="dirResidencia">Dirección de Residencia</label>
+          <input type="text" id="dirResidencia" value="CRA 4 6-31">
+        </div>
+        <div class="field">
+          <label for="fConsulta">F. Consulta</label>
+          <input type="text" id="fConsulta" class="mask" placeholder="__/__/____" value="10/03/2025">
+        </div>
+        <div class="field">
+          <label for="fInicioSintomas">F. Inicio Sintomas</label>
+          <input type="text" id="fInicioSintomas" class="mask" placeholder="__/__/____" value="08/03/2025">
+        </div>
+        <div class="field field-sm">
+          <label for="clasificacion">Clasificación del caso</label>
+          <select id="clasificacion" name="clasificacion">
+            <option value="1">1 · Sospechoso</option>
+            <option value="2">2 · Probable</option>
+            <option value="3">3 · Confirmado</option>
+            <option value="4" selected>4 · Descartado</option>
+          </select>
+        </div>
+        <div class="field field-sm">
+          <label for="hospitalizado">Hospitalizado</label>
+          <div class="yn">
+            <label class="chip-sm"><input type="radio" name="hospitalizado"><span>Sí</span></label>
+            <label class="chip-sm"><input type="radio" name="hospitalizado" checked><span>No</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fHospitalizacion">F. Hospitalización</label>
+          <input type="text" id="fHospitalizacion" class="mask" placeholder="__/__/____">
+        </div>
+        <div class="field field-sm">
+          <label for="condicion">Condición</label>
+          <select id="condicion" name="condicion">
+            <option value="1" selected>1 · Vivo</option>
+            <option value="2">2 · Muerto</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fDefuncion">F. Defunción</label>
+          <input type="text" id="fDefuncion" class="mask" placeholder="__/__/____">
+        </div>
+        <div class="field">
+          <label for="certificado">Certificado defunción</label>
+          <input type="text" id="certificado">
+        </div>
+        <div class="field field-span-2">
+          <label for="causaB">Causa B</label>
+          <input type="text" id="causaB">
+        </div>
+      </div>
+
+      <h3 class="subhead">Responsable de la ficha</h3>
+      <div class="grid grid-dense">
+        <div class="field field-span-2">
+          <label for="nombreDiligencia">Nombre del que diligencia la Ficha</label>
+          <input type="text" id="nombreDiligencia" value="ANDREA CORZO">
+        </div>
+        <div class="field">
+          <label for="telDiligencia">Teléfono del que diligencia la ficha</label>
+          <input type="tel" id="telDiligencia" value="3212554548">
+        </div>
+      </div>
+    </section>
+
+    <div class="save-card">
+      <div>
+        <h2>¿Listo para guardar?</h2>
+        <p>Verifique la información antes de guardar la notificación individual.</p>
+      </div>
+      <button class="btn-save">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="actionbar">
+    <div class="actionbar-inner">
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nueva
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Actualizar
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+      <button class="btn btn-ghost btn-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Cancelar
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Ant
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        Sig
+      </button>
+      <button class="btn btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Buscar
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Borrar
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir
+      </button>
+      <button class="btn btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Laboratorios
+      </button>
+      <button class="btn btn-primary">
+        Datos Complementarios
+      </button>
+    </div>
+  </footer>
+
+</body>
+</html>
