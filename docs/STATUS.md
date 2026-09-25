@@ -31,6 +31,13 @@
 - [x] **F3** Formulario responsivo Caracterización UPGD — ver `docs/reports/F3-report.md`
 - [x] **F4** Formulario Datos Básicos con validaciones dependientes — ver `docs/reports/F4-report.md`
 
+## Sprint 3 — Datos Complementarios Dinámicos y Sistema de Ajustes
+
+- [x] **B6** FichaDatosComplementarios JSONB + validación Pydantic por evento (Ofídico) — ver `docs/reports/B6-report.md`
+- [ ] **B7** Estados de fichas (Notificada/En Ajuste/Confirmada/Descartada) + trazabilidad
+- [x] **F5** Formulario Datos Complementarios (chips Sí/No, síntomas) — ver `docs/reports/F5-report.md`
+- [ ] **F6** Actionbar sticky + navegación por pestañas + modal búsqueda de casos
+
 ## Rulings (decisiones tomadas en nombre del usuario)
 
 - **R1** ~~No se commitea sin pedido explícito~~ SUPERSEDIDO por R6 (el usuario autorizó commitear). (Coste si falla: perdida de granularidad de rollback en git.)
@@ -47,6 +54,7 @@
 - **R12** Rol `UI` queda 403 en `/upgd` (la matriz RBAC no le asigna gestión de caracterización; UI solo notifica/transfiere casos). (Coste: si luego UI necesita leer UPGD, agregar permiso.)
 - **R13** No hay naming convention global en `Base.metadata` (las FKs se nombran explícitamente). Evaluar adoptar `naming_convention` en un PR futuro para estabilizar `alembic autogenerate`. (Coste: autogenerate puede proponer renombres si no se cuida.)
 - **R14** Los campos condicionales del frontend (otraIdentidad, grupoÉtnico, fHospitalización, fDefunción, certificado, gestante, desplazado) se mapean al JSONB `fichas_datos_basicos.grupos_poblacionales` (claves snake_case: `otra_identidad`, `grupo_etnico`, `gestante`, `semanas_gestacion`, `desplazado`, `f_hospitalizacion`, `f_defuncion`, `certificado`). El backend solo persiste el dict. Motivo: el modelo documentado en `BACKEND_ARCH.md` no lista esas columnas y `grupos_poblacionales` es el bucket JSONB para datos dinámicos. (Coste: menos tipado estricto en esos campos; se puede migrar a columnas si se requiere integridad referencial.)
+- **R15** Sin `datos-complementarios.html`, el set de síntomas del Accidente Ofídico se define así (y se persiste en el contrato B6/F5): locales {edema,dolor,eritema,equimosis,flictenas,necrosis_local}, sistémicas {nauseas,vomito,dolor_abdominal,bradicardia,hipotension,sangrado}, complicaciones {celulitis,necrosis,insuficiencia_renal,hipoxia}, datos_accidente {fecha,direccion,agente_agresor}, atencion_hospitalaria {empleo_suero,dosis}. `extra="forbid"` en el esquema. (Coste: si aparece el prototipo real, reconciliar estos campos.)
 
 ## Progreso
 
@@ -55,6 +63,7 @@
 - `2026-09-25` B3 completo → **Sprint 1 terminado**. pytest `13 passed`, ruff clean, migración `catalogos` aplicada, seed idempotente. Sembrado: 33 departamentos, 124 municipios, 19 eventos, 13 ocupaciones, 6 etnias (datos curados, no completos — ampliar sin tocar el seed). Endpoints `/catalogos/*` sin auth (R11).
 - `2026-09-25` B4 + F3 completos. Backend: pytest `21 passed`, ruff clean, migración `upgd_caracterizacion` aplicada + FK `usuarios.cod_upgd` (R7 resuelta). Frontend: lint + build limpios, ruta `/caracterizacion` prerenderizada.
 - `2026-09-25` B5 + F4 completos → **Sprint 2 terminado**. Backend: pytest `29 passed`, ruff clean, migración `ficha_datos_basicos` aplicada; UPGD fuerza su `cod_upgd`, filtros de listado. Frontend: lint + build limpios, ruta `/notificacion/datos-basicos`; validaciones dependientes vía Zod + `grupos_poblacionales` (R14). Deferred menores: catálogos static placeholder en F4 (wirear a `useCatalogos`) y `cod_upgd` de ficha sin FK (evaluar en Sprint 3).
+- `2026-09-25` B6 + F5 completos. Backend: pytest `37 passed`, ruff clean, migración `ficha_datos_complementarios` aplicada; POST duplicado → 409 explícito; validación ofídico con `extra="forbid"`. Frontend: lint + build limpios, ruta `/notificacion/datos-complementarios`; componente `YNChip` para reducir duplicación. Deferred: `cod_evento` de complementaria no se valida contra `ficha_basica.cod_evento` (ver en B7); catálogo `agente_agresor` y `empleo_suero` con convenciones educativas.
 ## Descubrimientos
 
 - **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.
