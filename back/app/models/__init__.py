@@ -3,11 +3,13 @@ from app.models.ficha_basica import (
     AreaOcurrencia,
     ClasificacionCaso,
     CondicionFinal,
+    EstadoFicha,
     FichaDatosBasicos,
     Sexo,
     UndMedEdad,
 )
 from app.models.ficha_complementaria import FichaDatosComplementarios
+from app.models.trazabilidad import FichaTrazabilidad
 from app.models.upgd import NivelComplejidad, UPGDCaracterizacion
 from app.models.usuario import RolEnum, Usuario
 
@@ -15,11 +17,13 @@ __all__ = [
     "AreaOcurrencia",
     "ClasificacionCaso",
     "CondicionFinal",
+    "EstadoFicha",
     "Departamento",
     "Etnia",
     "Evento",
     "FichaDatosBasicos",
     "FichaDatosComplementarios",
+    "FichaTrazabilidad",
     "Municipio",
     "NivelComplejidad",
     "Ocupacion",

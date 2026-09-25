@@ -15,6 +15,7 @@ from app.schemas.ficha_complementaria import (
     FichaDatosComplementariosOut,
     FichaDatosComplementariosUpdate,
 )
+from app.schemas.trazabilidad import EstadoTransitionRequest, TrazabilidadOut
 from app.schemas.upgd import (
     UPGDCaracterizacionCreate,
     UPGDCaracterizacionOut,
@@ -31,6 +32,7 @@ from app.schemas.usuario import (
 __all__ = [
     "DepartamentoOut",
     "EtniaOut",
+    "EstadoTransitionRequest",
     "EventoOut",
     "FichaDatosBasicosCreate",
     "FichaDatosBasicosOut",
@@ -44,6 +46,7 @@ __all__ = [
     "OcupacionOut",
     "RefreshRequest",
     "TokenResponse",
+    "TrazabilidadOut",
     "UPGDCaracterizacionCreate",
     "UPGDCaracterizacionOut",
     "UPGDCaracterizacionUpdate",

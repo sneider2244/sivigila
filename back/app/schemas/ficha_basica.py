@@ -8,6 +8,7 @@ from app.models.ficha_basica import (
     AreaOcurrencia,
     ClasificacionCaso,
     CondicionFinal,
+    EstadoFicha,
     Sexo,
     UndMedEdad,
 )
@@ -47,6 +48,9 @@ class FichaDatosBasicosBase(BaseModel):
     clasificacion_caso: ClasificacionCaso
     hospitalizado: bool = False
     condicion_final: CondicionFinal = CondicionFinal.VIVO
+
+    # Estado del ciclo de vida (Task B7). Default: NOTIFICADA.
+    estado: EstadoFicha = EstadoFicha.NOTIFICADA
 
 
 class FichaDatosBasicosCreate(FichaDatosBasicosBase):

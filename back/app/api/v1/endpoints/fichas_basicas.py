@@ -16,9 +16,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.rbac import require_roles
-from app.models.ficha_basica import FichaDatosBasicos
+from app.core.security import get_current_user
+from app.models.ficha_basica import EstadoFicha, FichaDatosBasicos
+from app.models.trazabilidad import FichaTrazabilidad
 from app.models.usuario import RolEnum, Usuario
 from app.schemas.ficha_basica import FichaDatosBasicosCreate, FichaDatosBasicosOut
+from app.schemas.trazabilidad import EstadoTransitionRequest, TrazabilidadOut
 
 router = APIRouter(prefix="/fichas", tags=["fichas-datos-basicos"])
 
@@ -32,11 +35,33 @@ _ROLES_LECTURA = (
 
 _ROLES_ESCRITURA = (RolEnum.UPGD, RolEnum.DOCENTE)
 
+# Roles que pueden revisar y cambiar el estado de una ficha (Task B7).
+# UPGD y UI quedan fuera (403).
+_ROLES_ESTADO = (
+    RolEnum.MUNICIPAL,
+    RolEnum.DEPARTAMENTAL,
+    RolEnum.NACIONAL,
+    RolEnum.DOCENTE,
+)
+
 _DETALLE_NO_ENCONTRADA = "Ficha de datos básicos no encontrada"
 _DETALLE_SIN_PERMISO = "No posee los permisos necesarios para realizar esta operación en SIVIGILA."
 
 _lectura_dependency = require_roles(*_ROLES_LECTURA)
 _escritura_dependency = require_roles(*_ROLES_ESCRITURA)
+_estado_dependency = require_roles(*_ROLES_ESTADO)
+
+# Máquina de estados del ciclo de vida (Task B7). Documentada en B7-report.md.
+_TRANSICIONES_PERMITIDAS: dict[EstadoFicha, frozenset[EstadoFicha]] = {
+    EstadoFicha.NOTIFICADA: frozenset(
+        {EstadoFicha.EN_AJUSTE, EstadoFicha.CONFIRMADA, EstadoFicha.DESCARTADA}
+    ),
+    EstadoFicha.EN_AJUSTE: frozenset(
+        {EstadoFicha.NOTIFICADA, EstadoFicha.CONFIRMADA, EstadoFicha.DESCARTADA}
+    ),
+    EstadoFicha.CONFIRMADA: frozenset({EstadoFicha.EN_AJUSTE}),
+    EstadoFicha.DESCARTADA: frozenset({EstadoFicha.NOTIFICADA}),
+}
 
 
 def _asegurar_ficha_propia(usuario: Usuario, cod_upgd: str) -> None:
@@ -118,4 +143,81 @@ async def listar_fichas_basicas(
         stmt = stmt.where(FichaDatosBasicos.anio == anio)
     if num_id is not None:
         stmt = stmt.where(FichaDatosBasicos.num_id == num_id)
+    return list(await db.scalars(stmt))
+
+
+@router.post(
+    "/datos-basicos/{ficha_id}/estado",
+    response_model=FichaDatosBasicosOut,
+)
+async def cambiar_estado_ficha(
+    ficha_id: int,
+    payload: EstadoTransitionRequest,
+    current_user: Usuario = Depends(_estado_dependency),
+    db: AsyncSession = Depends(get_db),
+) -> FichaDatosBasicos:
+    """Transiciona el estado de una ficha y registra la trazabilidad.
+
+    Valida la transición contra la máquina de estados; una transición no
+    permitida devuelve 422. Actualiza `estado` de la ficha y crea una fila en
+    `fichas_trazabilidad`.
+    """
+    ficha = await db.get(FichaDatosBasicos, ficha_id)
+    if ficha is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_NO_ENCONTRADA,
+        )
+
+    estado_anterior = ficha.estado
+    if payload.estado_nuevo not in _TRANSICIONES_PERMITIDAS[estado_anterior]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=(
+                f"Transición de estado no permitida: {estado_anterior.value} "
+                f"-> {payload.estado_nuevo.value}."
+            ),
+        )
+
+    ficha.estado = payload.estado_nuevo
+    trazabilidad = FichaTrazabilidad(
+        ficha_basica_id=ficha.id,
+        estado_anterior=estado_anterior,
+        estado_nuevo=payload.estado_nuevo,
+        usuario_id=current_user.id,
+        ajuste=payload.ajuste,
+        observacion=payload.observacion,
+    )
+    db.add(trazabilidad)
+    await db.commit()
+    await db.refresh(ficha)
+    return ficha
+
+
+@router.get(
+    "/datos-basicos/{ficha_id}/trazabilidad",
+    response_model=list[TrazabilidadOut],
+)
+async def listar_trazabilidad(
+    ficha_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[FichaTrazabilidad]:
+    """Lista la trazabilidad de una ficha, ordenada por `f_cambio` descendente.
+
+    Cualquier rol autenticado puede consultar; un UPGD solo sus propias fichas.
+    """
+    ficha = await db.get(FichaDatosBasicos, ficha_id)
+    if ficha is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_DETALLE_NO_ENCONTRADA,
+        )
+    _asegurar_ficha_propia(current_user, ficha.cod_upgd)
+
+    stmt = (
+        select(FichaTrazabilidad)
+        .where(FichaTrazabilidad.ficha_basica_id == ficha_id)
+        .order_by(FichaTrazabilidad.f_cambio.desc())
+    )
     return list(await db.scalars(stmt))

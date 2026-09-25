@@ -11,10 +11,20 @@ import enum
 from datetime import date
 
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, String
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+
+
+class EstadoFicha(str, enum.Enum):  # noqa: UP042 - patrón consistente con RolEnum
+    """Ciclo de vida de una ficha de notificación (Task B7)."""
+
+    NOTIFICADA = "NOTIFICADA"
+    EN_AJUSTE = "EN_AJUSTE"
+    CONFIRMADA = "CONFIRMADA"
+    DESCARTADA = "DESCARTADA"
 
 
 class Sexo(str, enum.Enum):  # noqa: UP042 - patrón consistente con RolEnum
@@ -107,6 +117,14 @@ class FichaDatosBasicos(Base):
     hospitalizado: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     # RULING: int 1..2 validado por CondicionFinal en Pydantic.
     condicion_final: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    # Estado del ciclo de vida (Task B7). Una ficha recién creada nace NOTIFICADA.
+    estado: Mapped[EstadoFicha] = mapped_column(
+        SQLEnum(EstadoFicha, name="estado_ficha"),
+        nullable=False,
+        default=EstadoFicha.NOTIFICADA,
+        server_default=EstadoFicha.NOTIFICADA.value,
+    )
 
     # Auditoría del simulador
     creado_por_usuario_id: Mapped[int | None] = mapped_column(
