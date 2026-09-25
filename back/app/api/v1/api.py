@@ -4,6 +4,7 @@ from app.api.v1.endpoints import (
     auth,
     caracterizacion,
     catalogos,
+    docente,
     fichas_basicas,
     fichas_complementarias,
     health,
@@ -16,3 +17,4 @@ api_router.include_router(catalogos.router, tags=["catalogos"])
 api_router.include_router(caracterizacion.router, tags=["caracterizacion-upgd"])
 api_router.include_router(fichas_basicas.router, tags=["fichas-datos-basicos"])
 api_router.include_router(fichas_complementarias.router, tags=["fichas-datos-complementarios"])
+api_router.include_router(docente.router, tags=["docente"])

@@ -5,6 +5,15 @@ from app.schemas.catalogo import (
     MunicipioOut,
     OcupacionOut,
 )
+from app.schemas.docente import (
+    AsignacionCreate,
+    AsignacionOut,
+    EscenarioCreate,
+    EscenarioOut,
+    EvaluacionDetalle,
+    EvaluacionResult,
+    EvaluarRequest,
+)
 from app.schemas.ficha_basica import (
     FichaDatosBasicosCreate,
     FichaDatosBasicosOut,
@@ -30,10 +39,17 @@ from app.schemas.usuario import (
 )
 
 __all__ = [
+    "AsignacionCreate",
+    "AsignacionOut",
     "DepartamentoOut",
     "EtniaOut",
     "EstadoTransitionRequest",
     "EventoOut",
+    "EscenarioCreate",
+    "EscenarioOut",
+    "EvaluacionDetalle",
+    "EvaluacionResult",
+    "EvaluarRequest",
     "FichaDatosBasicosCreate",
     "FichaDatosBasicosOut",
     "FichaDatosBasicosUpdate",

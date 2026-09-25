@@ -1,4 +1,5 @@
 from app.models.catalogos import Departamento, Etnia, Evento, Municipio, Ocupacion
+from app.models.docente import EscenarioAsignacion, EscenarioClinico, EstadoAsignacion
 from app.models.ficha_basica import (
     AreaOcurrencia,
     ClasificacionCaso,
@@ -21,6 +22,9 @@ __all__ = [
     "Departamento",
     "Etnia",
     "Evento",
+    "EscenarioAsignacion",
+    "EscenarioClinico",
+    "EstadoAsignacion",
     "FichaDatosBasicos",
     "FichaDatosComplementarios",
     "FichaTrazabilidad",
