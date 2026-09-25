@@ -16,6 +16,7 @@ interface UserState {
   refreshToken: string | null;
   setSession: (session: Session) => void;
   setTokens: (accessToken: string, refreshToken?: string) => void;
+  setUser: (user: Usuario) => void;
   clearSession: () => void;
 }
 
@@ -32,10 +33,12 @@ export const useUserStore = create<UserState>()(
           accessToken,
           refreshToken: refreshToken ?? state.refreshToken,
         })),
+      setUser: (user) => set({ user }),
       clearSession: () => set({ user: null, accessToken: null, refreshToken: null }),
     }),
     {
       name: "sivigila-user-session",
+      skipHydration: true,
     },
   ),
 );

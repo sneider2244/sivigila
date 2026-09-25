@@ -41,6 +41,39 @@
   font-size: 0.75rem;
 }
 
+.rolRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.rolSelect {
+  padding: 0.125rem 0.375rem;
+  color: $primary;
+  background: $surface;
+  border: 1px solid $primary-soft;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid $accent-yellow;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.rolError {
+  color: $accent-yellow;
+  font-size: 0.75rem;
+}
+
 .actions {
   display: flex;
   align-items: center;

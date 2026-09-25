@@ -5,6 +5,7 @@ interface UsuarioRaw {
   id: number;
   username: string;
   nombre_completo: string;
+  numero_identificacion: string | null;
   rol: Rol;
   cod_upgd: string | null;
   activo: boolean;
@@ -17,11 +18,12 @@ interface LoginResponseRaw {
   usuario: UsuarioRaw;
 }
 
-function mapUsuario(raw: UsuarioRaw): Usuario {
+export function mapUsuario(raw: UsuarioRaw): Usuario {
   return {
     id: raw.id,
     username: raw.username,
     nombreCompleto: raw.nombre_completo,
+    numeroIdentificacion: raw.numero_identificacion,
     rol: raw.rol,
     codUpgd: raw.cod_upgd,
     activo: raw.activo,
@@ -46,4 +48,28 @@ export async function login(
     password,
   });
   return mapLoginResponse(data);
+}
+
+export interface RegisterInput {
+  email: string;
+  nombreCompleto: string;
+  numeroIdentificacion: string;
+  rol: Rol;
+}
+
+export async function register(
+  input: RegisterInput,
+): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponseRaw>("/auth/register", {
+    email: input.email,
+    nombre_completo: input.nombreCompleto,
+    numero_identificacion: input.numeroIdentificacion,
+    rol: input.rol,
+  });
+  return mapLoginResponse(data);
+}
+
+export async function updateRol(rol: Rol): Promise<Usuario> {
+  const { data } = await api.patch<UsuarioRaw>("/auth/me", { rol });
+  return mapUsuario(data);
 }

@@ -6,10 +6,21 @@ export type Rol =
   | "NACIONAL"
   | "DOCENTE";
 
+export const ROLES_NO_DOCENTE = [
+  "UPGD",
+  "UI",
+  "MUNICIPAL",
+  "DEPARTAMENTAL",
+  "NACIONAL",
+] as const;
+
+export type RolNoDocente = (typeof ROLES_NO_DOCENTE)[number];
+
 export interface Usuario {
   id: number;
   username: string;
   nombreCompleto: string;
+  numeroIdentificacion: string | null;
   rol: Rol;
   codUpgd: string | null;
   activo: boolean;

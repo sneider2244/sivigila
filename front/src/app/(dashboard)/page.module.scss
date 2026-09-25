@@ -1,0 +1,77 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+  color: $text;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: $text-soft;
+  font-size: 0.9375rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+.cardTitle {
+  color: $primary;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.cardDescription {
+  color: $text-soft;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+@include responsive(sm) {
+  .page {
+    padding: 1.25rem 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

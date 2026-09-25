@@ -51,7 +51,7 @@ Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos
 - [x] **FP1** (back) registro `POST /auth/register` + rol dinámico `PATCH /auth/me` + columna `numero_identificacion` — ver `docs/reports/FP1-report.md`
 - [x] **FP2** (back) `GET /docente/estudiantes?q=` + unique constraint asignación + asignar bulk — ver `docs/reports/FP2-report.md`
 - [x] **FP3** (back) desacople RBAC (crear ficha cualquier rol) + `GET /estudiante/escenarios` (sin datos_esperados) + `POST .../entregar` — ver `docs/reports/FP3-report.md`
-- [ ] **FP4** (front) login dos modos + registro + home con módulos + guard + selector rol
+- [x] **FP4** (front) login dos modos + registro + home con módulos + guard + selector rol — ver `docs/reports/FP4-report.md`
 - [ ] **FP5** (front) `/mis-escenarios` + flujo diligenciar → entregar
 - [ ] **FP6** (front) docente: asignación masiva (buscador + checkboxes) + evaluar con un clic
 
@@ -94,6 +94,7 @@ Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos
 - `2026-09-25` **FP1 completo** (flujo estudiante/docente). Backend: pytest `59 passed`, ruff clean, migración `usuarios_numero_identificacion` aplicada; `POST /auth/register` (auto-login, 409 duplicado, DOCENTE→422) + `PATCH /auth/me` (rol dinámico, DOCENTE→422). Nota: `cod_upgd` del registro apunta a la UPGD demo `"150010123456"` (requiere que exista vía seed; test usa fixture).
 - `2026-09-25` **FP2 completo**. Backend: pytest `71 passed`, ruff clean, migración unique `(escenario_id, estudiante_id)`; `GET /docente/estudiantes?q=` (filtro case-insensitive por nombre/email/identificación) + asignar BULK idempotente.
 - `2026-09-25` **FP3 completo → backend del flujo terminado**. Backend: pytest `77 passed`, ruff clean, sin migraciones nuevas. Crear ficha abierto a cualquier rol con `cod_upgd` default demo (R21); `GET /estudiante/escenarios` ahora devuelve asignaciones con escenario SIN `datos_esperados` (R22); `POST .../entregar` marca COMPLETADO + vincula ficha.
+- `2026-09-25` **FP4 completo**. Frontend: lint + build limpios (9 páginas estáticas). Login dos modos (Estudiante/Docente) + registro de estudiante; home `(dashboard)/page.tsx` con tarjetas por rol; guard client-side (AuthGuard con hidratación via `skipHydration` + `persist.hasHydrated()`); NavigationTabs por rol; selector de rol en Topbar (PATCH /auth/me). Nota: `/mis-escenarios` da 404 hasta FP5.
 ## Descubrimientos
 
 - **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.
