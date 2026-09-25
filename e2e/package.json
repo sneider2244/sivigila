@@ -1,0 +1,14 @@
+{
+  "name": "sivigila-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright smoke tests + accessibility audit for SIVIGILA simulator",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.48.2"
+  }
+}

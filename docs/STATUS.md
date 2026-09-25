@@ -42,7 +42,7 @@
 
 - [x] **B8** API docentes: escenarios clínicos simulados + evaluación automatizada — ver `docs/reports/B8-report.md`
 - [x] **F7** Dashboard del Docente (revisión de diligenciamiento de estudiantes) — ver `docs/reports/F7-report.md`
-- [ ] **E2E** Pruebas end-to-end Playwright + auditoría de accesibilidad
+- [x] **E2E** Pruebas end-to-end Playwright + auditoría de accesibilidad — ver `docs/reports/E2E-report.md`
 
 ## Rulings (decisiones tomadas en nombre del usuario)
 
@@ -74,6 +74,7 @@
 - `2026-09-25` B6 + F5 completos. Backend: pytest `37 passed`, ruff clean, migración `ficha_datos_complementarios` aplicada; POST duplicado → 409 explícito; validación ofídico con `extra="forbid"`. Frontend: lint + build limpios, ruta `/notificacion/datos-complementarios`; componente `YNChip` para reducir duplicación. Deferred: `cod_evento` de complementaria no se valida contra `ficha_basica.cod_evento` (ver en B7); catálogo `agente_agresor` y `empleo_suero` con convenciones educativas.
 - `2026-09-25` B7 + F6 completos → **Sprint 3 terminado**. Backend: pytest `46 passed`, ruff clean, migración `estados_y_trazabilidad` aplicada; matriz de transiciones (R16). Frontend: lint + build limpios; Actionbar sticky + NavigationTabs + Topbar con logout + modal de búsqueda. Deferred: consistencia `cod_evento` complementaria vs básica (prioridad baja); `_base.scss` `overflow-x: hidden` puede interferir con sticky (revisar).
 - `2026-09-25` B8 + F7 completos. Backend: pytest `52 passed`, ruff clean, migración `modulo_docente` aplicada; evaluación automatizada por comparación de campos planos + `contenido`. Frontend: lint + build limpios, ruta `/docente/escenarios`; corregido shape plano de asignaciones (R17). Deferred: sin unique constraint `(escenario_id, estudiante_id)`; `GET /estudiante/escenarios` no filtra `activo`; `downgrade` de Alembic no dropea el enum (gotcha autogenerate).
+- `2026-09-25` E2E completo → **PROYECTO TERMINADO (4/4 sprints)**. Playwright `5 passed / 0 failed` (health, login render, login submit completo con `docente`/`docente123`, axe en `/login` y `/caracterizacion`). Axe: `0 critical`; **1 serious** `color-contrast` en subtítulo de `/caracterizacion` (4.34 < 4.5) y **1 moderate** `region` (Topbar fuera de landmarks) — quedan para pulido, no bloquean. Flujo de login end-to-end funcionando contra el stack real (Docker + uvicorn + next dev + seed).
 ## Descubrimientos
 
 - **Los prototipos HTML no existen en el repo** (`caracterizacion.html`, `sivigila.html`, `datos-complementarios.html`, `caracterizacion.css`). Los docs los citan como fuente de verdad de campos, pero nunca se commitearon. Sprint 2/3 se construye desde el spec que SÍ está en docs: `FichaDatosBasicos` completo en `BACKEND_ARCH.md`, lista parcial UPGD en `BACKEND_SUBAGENT_PROMPT.md`. Si aparecen los prototipos, reconciliar campos.
