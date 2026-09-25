@@ -44,6 +44,17 @@
 - [x] **F7** Dashboard del Docente (revisión de diligenciamiento de estudiantes) — ver `docs/reports/F7-report.md`
 - [x] **E2E** Pruebas end-to-end Playwright + auditoría de accesibilidad — ver `docs/reports/E2E-report.md`
 
+## Flujo estudiante + docente (spec: `docs/FLOW_PLAN.md`)
+
+Fases cortas, secuenciales (backend 1-2-3 → frontend 4-5-6). Contratos exactos en FLOW_PLAN.md.
+
+- [ ] **FP1** (back) registro `POST /auth/register` + rol dinámico `PATCH /auth/me` + columna `numero_identificacion`
+- [ ] **FP2** (back) `GET /docente/estudiantes?q=` + unique constraint asignación + asignar bulk
+- [ ] **FP3** (back) desacople RBAC (crear ficha cualquier rol) + `GET /estudiante/escenarios` (sin datos_esperados) + `POST .../entregar`
+- [ ] **FP4** (front) login dos modos + registro + home con módulos + guard + selector rol
+- [ ] **FP5** (front) `/mis-escenarios` + flujo diligenciar → entregar
+- [ ] **FP6** (front) docente: asignación masiva (buscador + checkboxes) + evaluar con un clic
+
 ## Rulings (decisiones tomadas en nombre del usuario)
 
 - **R1** ~~No se commitea sin pedido explícito~~ SUPERSEDIDO por R6 (el usuario autorizó commitear). (Coste si falla: perdida de granularidad de rollback en git.)
@@ -63,6 +74,11 @@
 - **R15** Sin `datos-complementarios.html`, el set de síntomas del Accidente Ofídico se define así (y se persiste en el contrato B6/F5): locales {edema,dolor,eritema,equimosis,flictenas,necrosis_local}, sistémicas {nauseas,vomito,dolor_abdominal,bradicardia,hipotension,sangrado}, complicaciones {celulitis,necrosis,insuficiencia_renal,hipoxia}, datos_accidente {fecha,direccion,agente_agresor}, atencion_hospitalaria {empleo_suero,dosis}. `extra="forbid"` en el esquema. (Coste: si aparece el prototipo real, reconciliar estos campos.)
 - **R16** Matriz de transiciones de estados definida por diseño (documentada en `docs/reports/B7-report.md`, ajustable en `_TRANSICIONES_PERMITIDAS`). El contrato solo decía "valida transición". (Coste: si el negocio define otra matriz, ajustar la constante.)
 - **R17** Shape de asignaciones (`GET /docente/asignaciones`) es PLANA: `{ id, escenario_id, escenario_titulo, estudiante_id, estudiante_username, estudiante_nombre, estado, ficha_basica_id }`. F7 lo modeló anidado (`escenario{...}`, `estudiante{...}`) por error; se corrigió el tipo/mapper/página a flat camelCase. (Coste: ninguno, es la reconciliación correcta.)
+- **R18** `email` = `username` (sin columna nueva); `numero_identificacion` = password (hash Argon2). Login de estudiante = `username=email`, `password=numero`. (Coste: el "password" del estudiante es su número, simbólico.)
+- **R19** `numero_identificacion` se guarda EN CLARO (columna nullable) para que el docente la vea. No apto producción; es un simulador educativo. (Coste: si se expone la DB, hay PII en claro.)
+- **R20** Rol dinámico no-bloqueante: cambiable vía `PATCH /auth/me` (nunca a DOCENTE). El flujo educativo no depende del rol. RBAC jerárquico (scoping UPGD, transiciones municipal/departamental/nacional) queda diferido como modo avanzado. (Coste: menos fidelidad al flujo institucional real, a cambio de no bloquear al estudiante.)
+- **R21** Estudiantes crean ficha con `cod_upgd` default = UPGD demo `"150010123456"` si no tienen uno. Elimina el 400 bloqueante. (Coste: todas las fichas de estudiantes comparten el mismo cod_upgd; el scoping UPGD pierde sentido, se refina en modo avanzado.)
+- **R22** El estudiante NUNCA recibe `datos_esperados` (clave de respuestas). `GET /estudiante/escenarios` expone una vista sin ese campo. (Coste: ninguno, evita fuga de respuestas.)
 
 ## Progreso
 
