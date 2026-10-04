@@ -1,29 +1,43 @@
 """
-database.py
-------------
-Capa de acceso a datos (SQLite) para SIVIGILA Moderno.
-Crea el esquema si no existe, siembra usuarios/eventos por defecto,
-y expone funciones CRUD simples usadas por la interfaz gráfica.
+Capa de acceso a datos (SQLite) para SIVIGILA Moderno (versión web).
+Crea el esquema si no existe, aplica migraciones pequeñas, siembra usuarios/eventos
+por defecto y expone funciones CRUD. Es la única capa que habla con SQLite.
 """
 
-import sqlite3
-import os
-import json
 import hashlib
+import json
+import os
 import secrets
-from datetime import datetime
+import sqlite3
+import unicodedata
 from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sivigila.db")
+RAIZ_REPO = Path(__file__).resolve().parent.parent
+
+
+def _db_path() -> str:
+    return os.environ.get("SIVIGILA_DB_PATH") or str(RAIZ_REPO / "sivigila.db")
+
 
 # ---------------------------------------------------------------------------
 # Conexión
 # ---------------------------------------------------------------------------
 
+def normalizar(texto):
+    """Minúsculas y sin tildes, para buscar 'perez' y encontrar 'PÉREZ'."""
+    if texto is None:
+        return None
+    descompuesto = unicodedata.normalize("NFD", str(texto))
+    return "".join(c for c in descompuesto if unicodedata.category(c) != "Mn").casefold()
+
+
 @contextmanager
 def get_conn():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(_db_path())
     conn.row_factory = sqlite3.Row
+    conn.create_function("normalizar", 1, normalizar, deterministic=True)
     conn.execute("PRAGMA foreign_keys = ON")
     try:
         yield conn
@@ -38,17 +52,19 @@ def get_conn():
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS usuarios (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    username        TEXT UNIQUE NOT NULL,
-    password_hash   TEXT NOT NULL,
-    salt            TEXT NOT NULL,
-    nombre_completo TEXT NOT NULL,
-    rol             TEXT NOT NULL DEFAULT 'digitador',
+    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+    username              TEXT UNIQUE NOT NULL,
+    password_hash         TEXT NOT NULL,
+    salt                  TEXT NOT NULL,
+    nombre_completo       TEXT NOT NULL,
+    rol                   TEXT NOT NULL DEFAULT 'digitador',
     -- rol ∈ super_admin | admin | digitador | consulta
-    permisos        TEXT NOT NULL DEFAULT '{}',   -- JSON de permisos granulares
-    activo          INTEGER NOT NULL DEFAULT 1,
-    creado_en       TEXT NOT NULL,
-    creado_por      INTEGER
+    permisos              TEXT NOT NULL DEFAULT '{}',   -- JSON de permisos granulares
+    activo                INTEGER NOT NULL DEFAULT 1,
+    debe_cambiar_password INTEGER NOT NULL DEFAULT 0,
+    sesion_version        INTEGER NOT NULL DEFAULT 0,
+    creado_en             TEXT NOT NULL,
+    creado_por            INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS upgd (
@@ -171,11 +187,36 @@ CREATE TABLE IF NOT EXISTS auditoria (
 """
 
 
+def _migrar(conn):
+    """Cambios de esquema sobre bases creadas por versiones anteriores."""
+    columnas = {r["name"] for r in conn.execute("PRAGMA table_info(usuarios)")}
+    if "debe_cambiar_password" not in columnas:
+        conn.execute(
+            "ALTER TABLE usuarios ADD COLUMN debe_cambiar_password INTEGER NOT NULL DEFAULT 0"
+        )
+        # Bases de la versión de escritorio: sus claves (incluidas las sembradas, que están
+        # publicadas en el README y en el historial de git) se deben cambiar al primer ingreso.
+        conn.execute("UPDATE usuarios SET debe_cambiar_password = 1")
+    if "sesion_version" not in columnas:
+        conn.execute("ALTER TABLE usuarios ADD COLUMN sesion_version INTEGER NOT NULL DEFAULT 0")
+
+
 def init_db():
     with get_conn() as conn:
         conn.executescript(SCHEMA)
+        _migrar(conn)
     _seed_eventos()
     _seed_admin()
+
+
+def _validar_columnas(conn, tabla: str, data: dict):
+    """Lista blanca: solo se aceptan claves que sean columnas reales de la tabla (sin 'id')."""
+    columnas = {r["name"] for r in conn.execute(f"PRAGMA table_info({tabla})")} - {"id"}
+    desconocidas = set(data) - columnas
+    if desconocidas:
+        raise ValueError(
+            f"Columnas no válidas para {tabla}: {', '.join(sorted(desconocidas))}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -196,9 +237,11 @@ def verify_password(password: str, password_hash: str, salt: str) -> bool:
 def _seed_admin():
     with get_conn() as conn:
         row = conn.execute("SELECT COUNT(*) c FROM usuarios").fetchone()
-        if row["c"] == 0:
-            create_user("admin", "Admin123!", "Administrador SIVIGILA", rol="super_admin")
-            create_user("SIVIGILA", "sivigila2026", "Usuario SIVIGILA", rol="digitador")
+    if row["c"] == 0:
+        # Solo el admin: cualquier otra cuenta la crea él desde "Usuarios". Una segunda cuenta
+        # sembrada con clave publicada la podría tomar quien entre primero.
+        create_user("admin", "Admin123!", "Administrador SIVIGILA", rol="super_admin",
+                    debe_cambiar_password=True)
 
 
 # ---------------------------------------------------------------------------
@@ -206,7 +249,7 @@ def _seed_admin():
 # ---------------------------------------------------------------------------
 
 # Jerarquía: un usuario solo puede crear/editar/desactivar usuarios de rango
-# igual o inferior al suyo (excepto super_admin, que administra a todos).
+# inferior al suyo (excepto super_admin, que administra a todos).
 ROLES_JERARQUIA = {"super_admin": 3, "admin": 2, "digitador": 1, "consulta": 0}
 ROLES_DISPONIBLES = list(ROLES_JERARQUIA.keys())
 
@@ -270,16 +313,25 @@ def puede_gestionar(actor_row, objetivo_row) -> bool:
     return rango_actor > rango_objetivo
 
 
+def roles_asignables(rol_actor) -> list:
+    """Roles que un actor puede asignar: super_admin todos; el resto, solo los de rango inferior."""
+    if rol_actor == "super_admin":
+        return list(ROLES_DISPONIBLES)
+    rango_actor = ROLES_JERARQUIA.get(rol_actor, 0)
+    return [r for r, rango in ROLES_JERARQUIA.items() if rango < rango_actor]
+
+
 def create_user(username, password, nombre_completo, rol="digitador",
-                 permisos=None, creado_por=None):
+                permisos=None, creado_por=None, debe_cambiar_password=False):
     pw_hash, salt = _hash_password(password)
     permisos = permisos if permisos is not None else permisos_por_defecto(rol)
     with get_conn() as conn:
         conn.execute(
             "INSERT INTO usuarios (username, password_hash, salt, nombre_completo, rol, "
-            "permisos, creado_en, creado_por) VALUES (?,?,?,?,?,?,?,?)",
+            "permisos, debe_cambiar_password, creado_en, creado_por) VALUES (?,?,?,?,?,?,?,?,?)",
             (username, pw_hash, salt, nombre_completo, rol,
-             json.dumps(permisos, ensure_ascii=False), datetime.now().isoformat(), creado_por),
+             json.dumps(permisos, ensure_ascii=False), 1 if debe_cambiar_password else 0,
+             datetime.now().isoformat(), creado_por),
         )
 
 
@@ -328,11 +380,21 @@ def set_user_active(user_id, activo: bool):
         conn.execute("UPDATE usuarios SET activo = ? WHERE id = ?", (1 if activo else 0, user_id))
 
 
-def reset_password(user_id, new_password):
+def reset_password(user_id, new_password, debe_cambiar=True):
+    """Cambia la clave y cierra todas las sesiones abiertas del usuario."""
     pw_hash, salt = _hash_password(new_password)
     with get_conn() as conn:
-        conn.execute("UPDATE usuarios SET password_hash = ?, salt = ? WHERE id = ?",
-                      (pw_hash, salt, user_id))
+        conn.execute(
+            "UPDATE usuarios SET password_hash = ?, salt = ?, debe_cambiar_password = ?, "
+            "sesion_version = sesion_version + 1 WHERE id = ?",
+            (pw_hash, salt, 1 if debe_cambiar else 0, user_id),
+        )
+
+
+def invalidar_sesiones(user_id):
+    """Hace inválidas todas las cookies de sesión emitidas hasta ahora para el usuario."""
+    with get_conn() as conn:
+        conn.execute("UPDATE usuarios SET sesion_version = sesion_version + 1 WHERE id = ?", (user_id,))
 
 
 def log_action(usuario_id, accion, detalle=""):
@@ -422,16 +484,16 @@ def get_evento(codigo):
 def upsert_upgd(data: dict, upgd_id=None):
     data = dict(data)
     with get_conn() as conn:
+        _validar_columnas(conn, "upgd", data)
         if upgd_id:
             campos = ", ".join(f"{k} = ?" for k in data)
             conn.execute(f"UPDATE upgd SET {campos} WHERE id = ?", (*data.values(), upgd_id))
             return upgd_id
-        else:
-            data["creado_en"] = datetime.now().isoformat()
-            campos = ", ".join(data.keys())
-            placeholders = ", ".join("?" for _ in data)
-            cur = conn.execute(f"INSERT INTO upgd ({campos}) VALUES ({placeholders})", tuple(data.values()))
-            return cur.lastrowid
+        data["creado_en"] = datetime.now().isoformat()
+        campos = ", ".join(data.keys())
+        placeholders = ", ".join("?" for _ in data)
+        cur = conn.execute(f"INSERT INTO upgd ({campos}) VALUES ({placeholders})", tuple(data.values()))
+        return cur.lastrowid
 
 
 def list_upgd():
@@ -453,6 +515,7 @@ def create_notificacion(data: dict, usuario_id: int):
     data["creado_por"] = usuario_id
     data["creado_en"] = datetime.now().isoformat()
     with get_conn() as conn:
+        _validar_columnas(conn, "notificaciones", data)
         campos = ", ".join(data.keys())
         placeholders = ", ".join("?" for _ in data)
         cur = conn.execute(
@@ -465,6 +528,7 @@ def update_notificacion(notificacion_id: int, data: dict):
     data = dict(data)
     data["actualizado_en"] = datetime.now().isoformat()
     with get_conn() as conn:
+        _validar_columnas(conn, "notificaciones", data)
         campos = ", ".join(f"{k} = ?" for k in data)
         conn.execute(f"UPDATE notificaciones SET {campos} WHERE id = ?", (*data.values(), notificacion_id))
 
@@ -474,26 +538,42 @@ def get_notificacion(notificacion_id):
         return conn.execute("SELECT * FROM notificaciones WHERE id = ?", (notificacion_id,)).fetchone()
 
 
-def list_notificaciones(filtro_texto="", codigo_evento=None):
+def _filtro_notificaciones(filtro_texto, codigo_evento):
+    sql, params = " WHERE 1=1", []
+    if filtro_texto:
+        # Sin distinguir mayúsculas ni tildes; '%' y '_' escritos por el usuario son texto.
+        sql += r""" AND (normalizar(n.primer_nombre) LIKE ? ESCAPE '\'
+                        OR normalizar(n.primer_apellido) LIKE ? ESCAPE '\'
+                        OR normalizar(n.numero_id) LIKE ? ESCAPE '\'
+                        OR normalizar(n.codigo_ficha) LIKE ? ESCAPE '\')"""
+        texto = normalizar(filtro_texto).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
+        like = f"%{texto}%"
+        params += [like, like, like, like]
+    if codigo_evento and codigo_evento != "Todos":
+        sql += " AND n.codigo_evento = ?"
+        params.append(codigo_evento)
+    return sql, params
+
+
+def list_notificaciones(filtro_texto="", codigo_evento=None, limite=None, offset=0):
+    where, params = _filtro_notificaciones(filtro_texto, codigo_evento)
     query = """
         SELECT n.*, e.nombre AS evento_nombre, u.razon_social AS upgd_nombre
         FROM notificaciones n
         JOIN eventos e ON e.codigo = n.codigo_evento
         JOIN upgd u ON u.id = n.upgd_id
-        WHERE 1=1
-    """
-    params = []
-    if filtro_texto:
-        query += """ AND (n.primer_nombre LIKE ? OR n.primer_apellido LIKE ?
-                          OR n.numero_id LIKE ? OR n.codigo_ficha LIKE ?)"""
-        like = f"%{filtro_texto}%"
-        params += [like, like, like, like]
-    if codigo_evento and codigo_evento != "Todos":
-        query += " AND n.codigo_evento = ?"
-        params.append(codigo_evento)
-    query += " ORDER BY n.creado_en DESC"
+    """ + where + " ORDER BY n.creado_en DESC, n.id DESC"
+    if limite is not None:
+        query += " LIMIT ? OFFSET ?"
+        params += [limite, offset]
     with get_conn() as conn:
         return conn.execute(query, params).fetchall()
+
+
+def count_notificaciones(filtro_texto="", codigo_evento=None) -> int:
+    where, params = _filtro_notificaciones(filtro_texto, codigo_evento)
+    with get_conn() as conn:
+        return conn.execute("SELECT COUNT(*) c FROM notificaciones n" + where, params).fetchone()["c"]
 
 
 def count_notificaciones_por_evento():
@@ -519,9 +599,16 @@ def add_laboratorio(notificacion_id, data: dict):
     data["notificacion_id"] = notificacion_id
     data["creado_en"] = datetime.now().isoformat()
     with get_conn() as conn:
+        _validar_columnas(conn, "laboratorios", data)
         campos = ", ".join(data.keys())
         placeholders = ", ".join("?" for _ in data)
-        conn.execute(f"INSERT INTO laboratorios ({campos}) VALUES ({placeholders})", tuple(data.values()))
+        cur = conn.execute(f"INSERT INTO laboratorios ({campos}) VALUES ({placeholders})", tuple(data.values()))
+        return cur.lastrowid
+
+
+def get_laboratorio(lab_id):
+    with get_conn() as conn:
+        return conn.execute("SELECT * FROM laboratorios WHERE id = ?", (lab_id,)).fetchone()
 
 
 def list_laboratorios(notificacion_id):

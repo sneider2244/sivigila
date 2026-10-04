@@ -1,0 +1,37 @@
+<p class="nota">{{ total }} ficha{{ "s" if total != 1 }}</p>
+{% if filas %}
+<div class="tabla-scroll">
+<table class="tabla">
+  <thead><tr><th>Paciente</th><th>Documento</th><th>Evento</th><th>UPGD</th><th>Notificado</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  {% for r in filas %}
+    <tr class="fila-ficha">
+      <td>{{ ((r["primer_nombre"] or "") ~ " " ~ (r["primer_apellido"] or "")).strip() or "(sin nombre)" }}</td>
+      <td>{{ r["tipo_id"] or "" }} {{ r["numero_id"] or "" }}</td>
+      <td>{{ r["evento_nombre"] }}</td>
+      <td>{{ r["upgd_nombre"] }}</td>
+      <td>{{ r["fecha_notificacion"] or "-" }}</td>
+      <td><span class="badge {{ 'ok' if r['estado_ficha'] == 'Terminada' else 'pendiente' }}">{{ r["estado_ficha"] }}</span></td>
+      <td><a class="btn secundario chico" href="/fichas/{{ r['id'] }}">Abrir</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if paginas > 1 %}
+<nav class="paginacion">
+  {% set base = "q=" ~ (q | urlencode) ~ "&evento=" ~ (evento | urlencode) %}
+  {% if pagina > 1 %}
+    <a class="btn chico" href="/listado?{{ base }}&pagina={{ pagina - 1 }}"
+       hx-get="/listado/resultados?{{ base }}&pagina={{ pagina - 1 }}" hx-target="#resultados">Anterior</a>
+  {% endif %}
+  <span>Página {{ pagina }} de {{ paginas }}</span>
+  {% if pagina < paginas %}
+    <a class="btn chico" href="/listado?{{ base }}&pagina={{ pagina + 1 }}"
+       hx-get="/listado/resultados?{{ base }}&pagina={{ pagina + 1 }}" hx-target="#resultados">Siguiente</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p class="nota">No se encontraron fichas con esos criterios.</p>
+{% endif %}

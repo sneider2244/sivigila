@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"[45]..","swap":false,"error":true}]}'>
+  <title>{% block titulo %}SIVIGILA{% endblock %} · SIVIGILA Moderno</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+{% if usuario %}
+<div class="layout">
+  <nav class="sidebar">
+    <div class="marca">SIVIGILA<small>Moderno</small></div>
+    {% set items = [
+      ("/", "Panel principal", "ver_reportes", "dashboard"),
+      ("/upgd", "Caracterización", "gestionar_caracterizacion", "upgd"),
+      ("/fichas/nueva", "Notificación individual", "notificar_individual", "fichas"),
+      ("/listado", "Fichas registradas", "ver_reportes", "listado"),
+      ("/usuarios", "Usuarios", "gestionar_usuarios", "usuarios"),
+    ] %}
+    {% for href, texto, permiso, clave in items %}
+      {% if permisos.get(permiso) %}
+        <a href="{{ href }}" class="nav{% if activo == clave %} activo{% endif %}">{{ texto }}</a>
+      {% endif %}
+    {% endfor %}
+    <div class="usuario-box">
+      <strong>{{ usuario["nombre_completo"] }}</strong>
+      <span>{{ rol_labels.get(usuario["rol"], usuario["rol"]) }}</span>
+      <a href="/cambiar-password" class="enlace-claro">Cambiar contraseña</a>
+    </div>
+    <form method="post" action="/logout">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn-link">Cerrar sesión</button>
+    </form>
+  </nav>
+{% endif %}
+  <main class="{{ 'contenido' if usuario else 'solo' }}">
+    {% block contenido %}{% endblock %}
+  </main>
+{% if usuario %}
+</div>
+{% endif %}
+</body>
+</html>

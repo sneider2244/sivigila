@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Fichas registradas{% endblock %}
+{% block contenido %}
+<h1>Fichas registradas</h1>
+<p class="sub">Busca, filtra, edita o continúa el diligenciamiento de una notificación.</p>
+<form id="filtros" class="barra" method="get" action="/listado"
+      hx-get="/listado/resultados" hx-target="#resultados" hx-swap="innerHTML"
+      hx-trigger="input changed delay:300ms from:#q, change from:#evento, submit">
+  <input type="search" id="q" name="q" value="{{ q }}" placeholder="Buscar por nombre, apellido, documento o código de ficha">
+  <select id="evento" name="evento">
+    <option value="">Todos los eventos</option>
+    {% for e in eventos %}
+      <option value="{{ e['codigo'] }}" {% if e['codigo'] == evento %}selected{% endif %}>{{ e["codigo"] }} - {{ e["nombre"] }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn secundario">Buscar</button>
+  {% if permisos.get("notificar_individual") %}<a class="btn primario" href="/fichas/nueva">Nueva ficha</a>{% endif %}
+</form>
+<div id="resultados">{% include "_listado_resultados.html" %}</div>
+{% endblock %}

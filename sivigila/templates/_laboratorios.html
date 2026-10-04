@@ -1,0 +1,39 @@
+{% from "_macros.html" import campo %}
+{% if puede_labs %}
+<form hx-post="/fichas/{{ ficha['id'] }}/laboratorios" hx-target="#laboratorios" hx-swap="innerHTML" class="sub-tarjeta">
+  <div class="rejilla cuatro">
+    {% for c in campos_lab %}
+      {{ campo(c, lab_valores.get(c.key), lab_errores.get(c.key), obligatorio=c.key == "prueba") }}
+    {% endfor %}
+  </div>
+  <button class="btn secundario">Agregar resultado de laboratorio</button>
+</form>
+{% endif %}
+<h3>Resultados registrados</h3>
+{% if labs %}
+<div class="tabla-scroll">
+<table class="tabla">
+  <thead><tr><th>Prueba</th><th>Muestra</th><th>Agente</th><th>Resultado</th><th>Valor</th><th>Toma</th><th>Fecha resultado</th>{% if puede_labs %}<th></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for lab in labs %}
+    <tr id="lab-{{ lab['id'] }}">
+      <td>{{ lab["prueba"] or "-" }}</td>
+      <td>{{ lab["muestra"] or "-" }}</td>
+      <td>{{ lab["agente"] or "-" }}</td>
+      <td>{{ lab["resultado"] or "-" }}</td>
+      <td>{{ lab["valor"] or "-" }}</td>
+      <td>{{ lab["fecha_toma"] or "-" }}</td>
+      <td>{{ lab["fecha_resultado"] or "-" }}</td>
+      {% if puede_labs %}
+      <td><button type="button" class="btn peligro chico"
+                  hx-post="/fichas/{{ ficha['id'] }}/laboratorios/{{ lab['id'] }}/eliminar"
+                  hx-target="#laboratorios" hx-swap="innerHTML">Quitar</button></td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="nota">Sin resultados registrados aún.</p>
+{% endif %}

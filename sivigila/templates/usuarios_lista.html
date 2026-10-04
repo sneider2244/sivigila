@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<h1>Gestión de usuarios</h1>
+<p class="sub">Crea usuarios, asígnales un rol y personaliza sus permisos. Solo puedes gestionar usuarios de rango inferior al tuyo.</p>
+{% if mensaje %}<p class="alerta exito">{{ mensaje }}</p>{% endif %}
+{% if puede_crear %}<p><a class="btn primario" href="/usuarios/nuevo">Crear nuevo usuario</a></p>{% endif %}
+<div class="tabla-scroll">
+<table class="tabla">
+  <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  {% for u in usuarios %}
+    {% set f = u.fila %}
+    <tr id="usuario-{{ f['id'] }}">
+      <td>{{ f["nombre_completo"] }}</td>
+      <td>{{ f["username"] }}</td>
+      <td>{{ rol_labels.get(f["rol"], f["rol"]) }}</td>
+      <td>{% if f["activo"] %}<span class="badge ok">Activo</span>{% else %}<span class="badge inactivo">Inactivo</span>{% endif %}</td>
+      <td>
+        {% if u.puede %}
+          <a class="btn secundario chico" href="/usuarios/{{ f['id'] }}/editar">Editar</a>
+          <a class="btn chico" href="/usuarios/{{ f['id'] }}/password">Clave</a>
+          {% if not u.es_yo %}
+          <form method="post" action="/usuarios/{{ f['id'] }}/activo" class="en-linea">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="activo" value="{{ 0 if f['activo'] else 1 }}">
+            <button class="btn chico {{ 'peligro' if f['activo'] else 'exito' }}">{{ "Desactivar" if f["activo"] else "Activar" }}</button>
+          </form>
+          {% endif %}
+        {% else %}
+          <span class="nota">Sin permisos sobre este usuario</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
