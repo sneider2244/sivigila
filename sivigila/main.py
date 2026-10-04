@@ -12,7 +12,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 
 from . import auth, db
-from .routes import dashboard, fichas, listado, login, upgd
+from .routes import dashboard, fichas, listado, login, upgd, usuarios
 from .web import es_htmx, redirigir, render
 
 logger = logging.getLogger("sivigila")
@@ -52,7 +52,7 @@ def create_app() -> FastAPI:
     )
     app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 
-    for modulo in (login, dashboard, upgd, fichas, listado):
+    for modulo in (login, dashboard, upgd, fichas, listado, usuarios):
         app.include_router(modulo.router)
 
     _registrar_errores(app)

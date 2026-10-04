@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<h1>{{ "Editar usuario" if objetivo else "Crear nuevo usuario" }}</h1>
+{% if errores %}<p class="alerta error">Revisa los campos marcados.</p>{% endif %}
+<form method="post" action="{{ '/usuarios/%d/editar' % objetivo['id'] if objetivo else '/usuarios/nuevo' }}" class="tarjeta" style="max-width: 560px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="campo{% if errores.get('username') %} con-error{% endif %}">
+    <label for="username">Código de usuario</label>
+    {% if objetivo %}
+      <input type="text" id="username" value="{{ objetivo['username'] }}" disabled>
+    {% else %}
+      <input type="text" id="username" name="username" value="{{ valores.get('username') or '' }}" required>
+    {% endif %}
+    {% if errores.get("username") %}<p class="campo-error">{{ errores.get("username") }}</p>{% endif %}
+  </div>
+
+  <div class="campo{% if errores.get('nombre_completo') %} con-error{% endif %}">
+    <label for="nombre_completo">Nombre completo</label>
+    <input type="text" id="nombre_completo" name="nombre_completo" value="{{ valores.get('nombre_completo') or '' }}">
+    {% if errores.get("nombre_completo") %}<p class="campo-error">{{ errores.get("nombre_completo") }}</p>{% endif %}
+  </div>
+
+  {% if not objetivo %}
+  <div class="campo{% if errores.get('password') %} con-error{% endif %}">
+    <label for="password">Contraseña inicial (mínimo {{ min_password }} caracteres)</label>
+    <input type="password" id="password" name="password" autocomplete="new-password">
+    {% if errores.get("password") %}<p class="campo-error">{{ errores.get("password") }}</p>{% endif %}
+    <p class="nota">El usuario deberá cambiarla en su primer ingreso.</p>
+  </div>
+  {% endif %}
+
+  <div class="campo{% if errores.get('rol') %} con-error{% endif %}">
+    <label for="rol">Rol</label>
+    <select id="rol" name="rol" hx-get="/usuarios/permisos" hx-target="#permisos" hx-swap="innerHTML">
+      {% for r in roles %}
+        <option value="{{ r }}" {% if r == valores.get('rol') %}selected{% endif %}>{{ rol_labels.get(r, r) }}</option>
+      {% endfor %}
+    </select>
+    {% if errores.get("rol") %}<p class="campo-error">{{ errores.get("rol") }}</p>{% endif %}
+  </div>
+
+  <h2>Permisos</h2>
+  <div id="permisos" class="checks">{% include "_permisos.html" %}</div>
+
+  <div class="acciones">
+    <button class="btn primario">Guardar</button>
+    <a class="btn" href="/usuarios">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

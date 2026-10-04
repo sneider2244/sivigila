@@ -1,0 +1,3 @@
+{% for clave, etiqueta in permisos_labels.items() %}
+  <label class="campo-check"><input type="checkbox" name="perm_{{ clave }}" value="1" {% if permisos_usuario.get(clave) %}checked{% endif %}> {{ etiqueta }}</label>
+{% endfor %}
