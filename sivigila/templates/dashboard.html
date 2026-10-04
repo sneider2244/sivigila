@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Panel principal{% endblock %}
+{% block contenido %}
+<h1>Bienvenido(a), {{ usuario["nombre_completo"].split()[0] }}</h1>
+<p class="sub">{{ hoy.strftime("%d/%m/%Y") }}{% if upgd %} · UPGD activa: {{ upgd["razon_social"] }}{% endif %}</p>
+
+<div class="tarjetas">
+  {% if permisos.get("gestionar_caracterizacion") %}
+  <a class="tarjeta-acceso" href="/upgd"><strong>Caracterización</strong><span>Configura la UPGD que notifica</span></a>
+  {% endif %}
+  {% if permisos.get("notificar_individual") %}
+  <a class="tarjeta-acceso" href="/fichas/nueva"><strong>Individual</strong><span>Diligencia fichas de vigilancia</span></a>
+  {% endif %}
+  {% if permisos.get("ver_reportes") %}
+  <a class="tarjeta-acceso" href="/listado"><strong>Fichas registradas</strong><span>Consulta, edita y filtra notificaciones</span></a>
+  {% endif %}
+  {% if permisos.get("gestionar_usuarios") %}
+  <a class="tarjeta-acceso" href="/usuarios"><strong>Usuarios</strong><span>Crea usuarios y administra permisos</span></a>
+  {% endif %}
+</div>
+
+<h2>Casos notificados por evento</h2>
+<section class="tarjeta">
+  {% if hay_casos %}
+    {% for s in stats %}
+    <div class="barra-stat">
+      <span>{{ s["nombre"] }}</span>
+      <div class="barra-fondo"><div class="barra-valor" style="width: {{ [4, (s['total'] * 100 / maximo) | round(0)] | max }}%"></div></div>
+      <strong>{{ s["total"] }}</strong>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="nota">Aún no hay fichas registradas.</p>
+  {% endif %}
+</section>
+
+{% if not upgd %}
+<p class="alerta aviso">Aún no has configurado ninguna UPGD. Ve a «Caracterización» antes de notificar casos.</p>
+{% endif %}
+{% endblock %}

@@ -21,3 +21,12 @@ def client(db):
     auth.reiniciar_intentos()
     with TestClient(create_app()) as c:
         yield c
+
+
+@pytest.fixture
+def digitador(db, client):
+    from tests.utils import crear_usuario, iniciar_sesion
+
+    usuario = crear_usuario(db, "digi")
+    iniciar_sesion(client, "digi")
+    return usuario

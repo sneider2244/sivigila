@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo %}
+{% block titulo %}Caracterización{% endblock %}
+{% block contenido %}
+<h1>{{ "Editar UPGD" if upgd else "Nueva UPGD" }}</h1>
+<p class="sub">Los campos con * son obligatorios.</p>
+{% if errores %}<p class="alerta error">Revisa los campos marcados.</p>{% endif %}
+<form method="post" action="{{ '/upgd/%d' % upgd['id'] if upgd else '/upgd/nueva' }}" class="tarjeta">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="rejilla dos">
+    {% for c in campos %}
+      {{ campo(c, valores.get(c.key), errores.get(c.key), obligatorio=c.key in obligatorios) }}
+    {% endfor %}
+  </div>
+  <h2>Recursos adicionales para la vigilancia epidemiológica</h2>
+  <div class="checks">
+    {% for clave, etiqueta in recursos.items() %}
+      <label><input type="checkbox" name="{{ clave }}" value="1" {% if valores.get(clave) and valores.get(clave) != "0" %}checked{% endif %}> {{ etiqueta }}</label>
+    {% endfor %}
+  </div>
+  <div class="acciones">
+    <button class="btn primario">Guardar caracterización</button>
+    <a class="btn" href="/upgd">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

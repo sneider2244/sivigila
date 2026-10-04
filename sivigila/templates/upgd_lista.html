@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Caracterización{% endblock %}
+{% block contenido %}
+<h1>Caracterización de la UPGD</h1>
+<p class="sub">Configura la unidad notificadora: identificación, contacto y recursos disponibles para la vigilancia epidemiológica.</p>
+{% if mensaje %}<p class="alerta exito">{{ mensaje }}</p>{% endif %}
+<p><a class="btn primario" href="/upgd/nueva">Nueva UPGD</a></p>
+{% if upgds %}
+<table class="tabla">
+  <thead><tr><th>Razón social</th><th>NIT</th><th>Nivel</th><th>Sesión</th><th></th></tr></thead>
+  <tbody>
+  {% for u in upgds %}
+    {% set en_uso = upgd_activa and u["id"] == upgd_activa["id"] %}
+    <tr id="upgd-{{ u['id'] }}">
+      <td>{{ u["razon_social"] }}</td>
+      <td>{{ u["nit"] or "-" }}</td>
+      <td>{{ u["nivel_complejidad"] or "-" }}</td>
+      <td>{% if en_uso %}<span class="badge ok">En uso</span>{% endif %}</td>
+      <td>
+        <a class="btn secundario chico" href="/upgd/{{ u['id'] }}">Editar</a>
+        {% if not en_uso %}
+        <form method="post" action="/upgd/{{ u['id'] }}/activar" class="en-linea">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn chico">Usar en sesión</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="nota">No hay UPGD registradas todavía.</p>
+{% endif %}
+{% endblock %}
