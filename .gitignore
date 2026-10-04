@@ -1,8 +1,0 @@
-sivigila.db
-*.db-journal
-__pycache__/
-*.pyc
-.venv/
-venv/
-.pytest_cache/
-.playwright-mcp/
