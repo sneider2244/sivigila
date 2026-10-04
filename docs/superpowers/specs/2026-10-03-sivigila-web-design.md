@@ -89,8 +89,11 @@ Principios:
 - **Credenciales por defecto:**
   - La pantalla de login ya no muestra credenciales.
   - `admin` / `SIVIGILA` se siembran solo si la tabla `usuarios` está vacía (comportamiento actual).
-  - Se agrega la columna `debe_cambiar_password` (INTEGER, default 0). El admin sembrado queda con 1;
-    mientras sea 1, cualquier ruta redirige a `/cambiar-password` hasta que la cambie.
+  - Se agrega la columna `debe_cambiar_password` (INTEGER, default 0). Quedan con 1: los dos usuarios
+    sembrados (`admin` y `SIVIGILA`, cuyas claves están publicadas en el README), los usuarios que crea
+    un admin y los que reciben una contraseña restablecida. Mientras sea 1, cualquier ruta redirige a
+    `/cambiar-password` hasta que la cambie.
+  - Longitud mínima de contraseña: 6 caracteres (la misma de hoy).
 - **CSRF:** token por sesión. Todo formulario lleva `<input type="hidden" name="csrf_token">`; las
   peticiones HTMX lo envían en el encabezado `X-CSRF-Token` (configurado una vez en `base.html`).
   Toda petición `POST`/`DELETE` sin token válido → 403.
@@ -104,7 +107,7 @@ Se conservan `ROLES_JERARQUIA`, `PERMISOS_DEFAULT` y `PERMISOS_LABELS` tal como 
 |---|---|
 | `GET /` (dashboard) | `ver_reportes` |
 | `GET /listado`, `GET /listado/resultados` | `ver_reportes` |
-| `GET/POST /upgd` | `gestionar_caracterizacion` |
+| `/upgd`, `/upgd/nueva`, `/upgd/{id}`, `/upgd/{id}/activar` | `gestionar_caracterizacion` |
 | `GET /fichas/nueva`, `POST /fichas` | `notificar_individual` |
 | `GET /fichas/{id}` | `notificar_individual` o `editar_notificaciones` o `ver_reportes` (solo lectura si no tiene `editar_notificaciones`) |
 | `POST /fichas/{id}`, `POST /fichas/{id}/terminar`, `POST /fichas/{id}/eliminar` | `editar_notificaciones` |
@@ -126,10 +129,13 @@ Tarjetas de acceso (filtradas por permisos) y barras de casos por evento con
 `count_notificaciones_por_evento()`, dibujadas con HTML/CSS (sin librería de gráficos).
 
 ### 5.2 UPGD (`/upgd`)
+- `/upgd` lista las UPGD configuradas (como hoy). `/upgd/nueva` crea; `/upgd/{id}` edita.
 - Formulario con los mismos campos y recursos (checkboxes) que hoy.
-- **Corrección:** si ya existe una UPGD, el formulario la carga y `POST` la actualiza
-  (`upsert_upgd(data, upgd_id)`); solo crea una nueva si no hay ninguna.
-- Selector de "UPGD activa": se guarda en la sesión (`upgd_id`) y se usa por defecto en la ficha.
+- **Corrección:** editar una UPGD la actualiza (`upsert_upgd(data, upgd_id)`) en vez de crear otra.
+- "Usar en sesión" (`POST /upgd/{id}/activar`) guarda la UPGD activa en la sesión (`upgd_id`); la
+  ficha nueva la usa. Si la sesión no tiene una, se toma la primera UPGD registrada (como hoy).
+- Al editar una ficha existente se conserva su `upgd_id` original (hoy se sobrescribía con la UPGD
+  activa de la sesión).
 
 ### 5.3 Ficha individual (`/fichas/nueva`, `/fichas/{id}`)
 - Una página, tres pestañas (Datos básicos, Complementarios, Laboratorios). Cambiar de pestaña es
@@ -138,7 +144,7 @@ Tarjetas de acceso (filtradas por permisos) y barras de casos por evento con
   `GET /fichas/campos?evento=<codigo>` y reemplaza solo esa pestaña. Mapeo:
   `si_no` → radio Sí/No, `lista` → `<select>` con sus opciones, `texto` → `<input type="text">`.
 - **Guardar:** valida formato y guarda con `estado_ficha = "En proceso"`. Si es nueva, redirige a
-  `/fichas/{id}`.
+  `/fichas/{id}`. Una ficha nueva solo muestra "Guardar"; "Terminar" aparece cuando ya existe.
 - **Terminar:** valida completo (obligatorios de básicos y todos los complementarios definidos) y
   pasa a `"Terminada"`. Una ficha terminada sigue siendo editable por quien tenga
   `editar_notificaciones` (igual que hoy).
@@ -157,7 +163,9 @@ ficha y muestra el estado.
 ### 5.5 Usuarios (`/usuarios`)
 Listado, crear, editar (nombre, rol, permisos granulares), activar/desactivar y restablecer
 contraseña, todos como páginas o formularios en página (sin diálogos modales del navegador).
-Cada acción valida `gestionar_usuarios` y `puede_gestionar`.
+Cada acción valida `gestionar_usuarios` y `puede_gestionar`. Al cambiar el rol en el formulario,
+HTMX recarga los permisos por defecto de ese rol (`GET /usuarios/permisos?rol=`), igual que hoy
+lo hace la ventana de escritorio.
 
 ## 6. Capa de datos (`db.py`)
 
