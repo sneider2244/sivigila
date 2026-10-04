@@ -1,111 +1,108 @@
 # SIVIGILA Moderno 🩺
 
-Versión moderna e interactiva del flujo mostrado en tus capturas de pantalla
-del Software SIVIGILA (login → caracterización → notificación individual →
-datos complementarios → laboratorio → terminar), construida en **Python**
-con:
+Versión web moderna del flujo de notificación del Software SIVIGILA
+(login → caracterización → notificación individual → datos complementarios →
+laboratorio → terminar), construida en **Python** con:
 
-- **CustomTkinter** → interfaz gráfica moderna (tema oscuro, tarjetas,
-  botones redondeados, barra lateral de navegación).
+- **FastAPI + Jinja2** → páginas generadas en el servidor; **HTMX** solo para
+  las partes que cambian sin recargar (campos complementarios, laboratorios,
+  buscador del listado).
 - **SQLite** → base de datos local, sin necesidad de instalar un servidor.
-- **Login real** → usuarios guardados en base de datos con contraseñas
-  cifradas (PBKDF2-SHA256 + salt, sin contraseñas en texto plano).
-- **Formularios dinámicos** → a diferencia del software original, la
-  página de "Datos complementarios" se genera automáticamente según el
-  evento que elijas (ya vienen configurados Chagas, Accidente Ofídico y
-  Dengue, y puedes agregar más eventos en `database.py`).
+- **Login real** → contraseñas con PBKDF2-SHA256 + sal, sesión en cookie
+  firmada, protección CSRF y bloqueo tras 5 intentos fallidos.
+- **Permisos validados en el servidor** → cada ruta exige su permiso; ocultar
+  un botón es solo comodidad visual.
+- **Formularios dinámicos** → la pestaña "Datos complementarios" se genera
+  según el evento (ya vienen Chagas, Accidente Ofídico y Dengue).
 
-## 1. Instalación
+## 1. Requisitos
 
-Requiere Python 3.9 o superior.
+- Python 3.13
 
-```bash
-cd sivigila_moderno
-python -m venv venv
-source venv/bin/activate      # En Windows: venv\Scripts\activate
-pip install -r requirements.txt
+## 2. Instalación
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
 ```
 
-## 2. Ejecutar
+## 3. Ejecución local
 
-```bash
-python app.py
+```powershell
+$env:SIVIGILA_SECRET_KEY = "<una cadena larga y aleatoria>"   # opcional en local; obligatoria fuera de tu máquina
+uvicorn sivigila.main:app --reload
 ```
 
-Al iniciar por primera vez se crea automáticamente el archivo `sivigila.db`
-con dos usuarios de prueba:
+Abre http://127.0.0.1:8000. La base `sivigila.db` se crea sola en la raíz del
+repo (no se versiona).
 
-| Usuario    | Contraseña     | Rol                |
-|------------|----------------|--------------------|
-| `admin`    | `Admin123!`    | Super administrador|
-| `SIVIGILA` | `sivigila2026` | Digitador          |
+Al crear una base nueva se siembran dos usuarios: `admin` (super
+administrador) y `SIVIGILA` (digitador). Las contraseñas iniciales están en
+`sivigila/db.py` (`_seed_admin`) y ambos deben cambiarla en su primer ingreso.
 
-> ⚠️ Cambia estas contraseñas antes de usar el sistema con datos reales
-> (inicia sesión como `admin` → menú **Usuarios** → botón **Clave**).
+| Variable | Para qué |
+|---|---|
+| `SIVIGILA_SECRET_KEY` | Firma de la cookie de sesión. Sin ella se usa una clave de desarrollo y se avisa en el log. |
+| `SIVIGILA_DB_PATH` | Ruta de la base SQLite (por defecto `sivigila.db` en la raíz). |
+| `SIVIGILA_COOKIE_SECURE` | `1` para marcar la cookie como `Secure` (cuando haya HTTPS). |
 
-## 3. Roles y permisos
+## 4. Tests
 
-El sistema ahora tiene 4 roles con una jerarquía clara:
+```powershell
+python -m pytest
+```
 
-| Rol                  | Puede...                                                        |
-|-----------------------|------------------------------------------------------------------|
-| **Super administrador** | Todo, incluyendo crear/editar/desactivar a cualquier usuario, incluso otros administradores. |
-| **Administrador**       | Notificar, editar caracterización/laboratorios, y gestionar usuarios de rango *digitador* o *consulta* (no puede tocar a otros admins). |
-| **Digitador**            | Diligenciar y editar fichas, laboratorios y caracterización. No administra usuarios. |
-| **Consulta**             | Solo ve el panel de indicadores y el listado de fichas (modo lectura). |
+## 5. Roles y permisos
 
-Además de los roles, cada usuario tiene **permisos granulares** (checkboxes)
-que puedes personalizar individualmente desde **Usuarios → Editar**:
-gestionar usuarios, gestionar caracterización, notificar, editar/terminar
-fichas, gestionar laboratorios y ver reportes. Al cambiar el rol de un
-usuario, los permisos se resetean a los valores por defecto de ese rol,
-pero luego puedes ajustarlos uno por uno.
+| Rol | Puede... |
+|---|---|
+| **Super administrador** | Todo, incluso gestionar a otros administradores. |
+| **Administrador** | Notificar, caracterización, laboratorios y gestionar usuarios de rango *digitador* o *consulta*. |
+| **Digitador** | Diligenciar y editar fichas, laboratorios y caracterización. No administra usuarios. |
+| **Consulta** | Panel, listado y fichas en solo lectura. |
 
-### Cómo crear un nuevo usuario (como super administrador o administrador)
+Cada usuario tiene además **permisos granulares** que se ajustan desde
+**Usuarios → Editar**. Al cambiar el rol, los permisos se cargan con los de
+ese rol y luego se pueden ajustar uno por uno. Los usuarios creados por un
+administrador, o a quienes se les restablece la clave, deben cambiarla en su
+siguiente ingreso.
 
-1. Inicia sesión con una cuenta que tenga el permiso "Gestionar usuarios"
-   (por defecto, `admin`).
-2. Ve al menú lateral **👥 Usuarios**.
-3. Clic en **➕ Crear nuevo usuario**, completa código, nombre, contraseña
-   inicial y rol. Los permisos se autocompletan según el rol elegido — puedes
-   marcarlos o desmarcarlos manualmente.
-4. Desde la misma pantalla puedes **Editar**, **Activar/Desactivar** o
-   **restablecer la Clave** de cualquier usuario que esté en tu jerarquía o
-   por debajo (un administrador no puede modificar a otro administrador ni
-   al super administrador; el super administrador sí puede gestionar a
-   todos).
-
-## 4. Flujo de uso (equivalente al del manual)
+## 6. Flujo de uso
 
 1. **Login** con código de usuario y contraseña.
-2. **Caracterización**: registra la UPGD (razón social, NIT, responsable,
-   recursos disponibles) y selecciónala como activa para la sesión.
+2. **Caracterización**: registra o edita la UPGD y márcala "Usar en sesión".
 3. **Notificación individual**:
-   - Pestaña 1 — Datos básicos del paciente (iguales para todas las fichas).
-   - Pestaña 2 — Datos complementarios (el formulario cambia según el
-     evento que elijas: Chagas, Accidente Ofídico, Dengue, etc.).
-   - Pestaña 3 — Laboratorios (agrega uno o varios resultados a la ficha).
-4. **Guardar** deja la ficha "En proceso"; **Terminar** la marca como
-   "Terminada" y lista para envío.
-5. **Fichas registradas**: buscador y filtro por evento, con indicador de
-   estado y acceso directo para editar cada ficha.
-6. **Panel principal**: accesos rápidos + gráfico de barras con el número
-   de casos notificados por evento.
+   - Pestaña 1 — Datos básicos del paciente. La edad se calcula sola desde la
+     fecha de nacimiento.
+   - Pestaña 2 — Datos complementarios según el evento.
+   - Pestaña 3 — Laboratorios (disponible cuando la ficha ya está guardada).
+4. **Guardar** deja la ficha "En proceso"; **Terminar** valida que esté
+   completa y la marca "Terminada".
+5. **Fichas registradas**: búsqueda mientras escribes, filtro por evento y
+   paginación de 50.
+6. **Panel principal**: accesos rápidos y casos notificados por evento.
 
-## 5. Estructura del proyecto
+## 7. Estructura
 
 ```
-sivigila_moderno/
-├── app.py           # Interfaz gráfica (CustomTkinter) y navegación
-├── database.py       # Esquema SQLite, seguridad de contraseñas y CRUD
-├── requirements.txt
-├── README.md
-└── sivigila.db        # Se crea automáticamente al ejecutar por primera vez
+sivigila/
+├─ main.py          app FastAPI, middleware y manejo de errores
+├─ db.py            única capa que habla con SQLite
+├─ auth.py          sesión, CSRF, permisos por ruta, bloqueo de login
+├─ validacion.py    validación de formularios
+├─ catalogos.py     campos de cada formulario
+├─ web.py           helpers de render
+├─ routes/          un archivo por pantalla
+├─ templates/       plantillas Jinja2 (los parciales HTMX empiezan con _)
+└─ static/          CSS, JS de pestañas y htmx.min.js
+tests/              pytest
+docs/superpowers/   spec y plan de la migración web
 ```
 
-## 6. Cómo agregar un nuevo evento con su propio formulario
+## 8. Cómo agregar un evento con su propio formulario
 
-En `database.py`, dentro de `EVENTOS_DEFAULT`, agrega un bloque como:
+En `sivigila/db.py`, dentro de `EVENTOS_DEFAULT`, agrega un bloque como:
 
 ```python
 {
@@ -120,16 +117,15 @@ En `database.py`, dentro de `EVENTOS_DEFAULT`, agrega un bloque como:
 },
 ```
 
-Tipos de campo soportados: `texto`, `si_no`, `lista` (con `opciones`).
-La próxima vez que ejecutes la app (con una base de datos nueva) el
-formulario de "Datos complementarios" para ese evento se generará solo.
+Tipos de campo soportados: `texto`, `si_no`, `lista` (con `opciones`). Los
+eventos solo se siembran en una base nueva.
 
-## 7. Notas de seguridad
+## 9. Notas de seguridad
 
-- Las contraseñas nunca se guardan en texto plano: se usa
-  `hashlib.pbkdf2_hmac` con 200.000 iteraciones y una sal aleatoria por
-  usuario.
-- Toda la información queda en tu propio computador (`sivigila.db`); no se
-  envía a ningún servidor externo. Si necesitas trabajo en red/multiusuario
-  real, este proyecto es una buena base para migrar a PostgreSQL/MySQL más
-  adelante.
+- Las contraseñas se guardan con `hashlib.pbkdf2_hmac` (200.000 iteraciones,
+  sal por usuario).
+- `sivigila.db` contiene datos de pacientes (Ley 1581): no la subas a git
+  (ya está en `.gitignore`) ni la compartas. Las versiones anteriores del
+  repo sí la versionaron; ver el historial de git antes de publicarlo.
+- Los logs del servidor no incluyen datos de pacientes: solo ruta, método y
+  tipo de error.
