@@ -9,3 +9,15 @@ def db(tmp_path, monkeypatch):
 
     modulo_db.init_db()
     return modulo_db
+
+from fastapi.testclient import TestClient
+
+
+@pytest.fixture
+def client(db):
+    from sivigila import auth
+    from sivigila.main import create_app
+
+    auth.reiniciar_intentos()
+    with TestClient(create_app()) as c:
+        yield c

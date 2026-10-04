@@ -1,0 +1,25 @@
+{% macro campo(c, valor, error, prefijo="", solo_lectura=false, obligatorio=false) %}
+{% set nombre = prefijo ~ c.key %}
+<div class="campo{% if error %} con-error{% endif %}">
+  <label for="{{ nombre }}">{{ c.label }}{% if obligatorio %} *{% endif %}</label>
+  {% if c.tipo == "fecha" %}
+    <input type="date" id="{{ nombre }}" name="{{ nombre }}" value="{{ valor or '' }}" {% if solo_lectura %}disabled{% endif %}>
+  {% elif c.tipo == "lista" %}
+    <select id="{{ nombre }}" name="{{ nombre }}" {% if solo_lectura %}disabled{% endif %}>
+      <option value="">— Selecciona —</option>
+      {% for op in c.opciones %}
+        <option value="{{ op }}" {% if valor == op %}selected{% endif %}>{{ op }}</option>
+      {% endfor %}
+    </select>
+  {% elif c.tipo == "si_no" %}
+    <div class="radios" id="{{ nombre }}">
+      {% for op in ["Sí", "No"] %}
+        <label><input type="radio" name="{{ nombre }}" value="{{ op }}" {% if valor == op %}checked{% endif %} {% if solo_lectura %}disabled{% endif %}> {{ op }}</label>
+      {% endfor %}
+    </div>
+  {% else %}
+    <input type="text" id="{{ nombre }}" name="{{ nombre }}" value="{{ valor if valor is not none else '' }}" {% if solo_lectura %}disabled{% endif %}>
+  {% endif %}
+  {% if error %}<p class="campo-error">{{ error }}</p>{% endif %}
+</div>
+{% endmacro %}

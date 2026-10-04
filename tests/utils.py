@@ -1,3 +1,4 @@
+import re
 from datetime import date, timedelta
 
 CLAVE = "clave-segura-1"
@@ -53,3 +54,22 @@ def ficha_completa(**extra):
     }
     datos.update(extra)
     return datos
+
+
+_META_CSRF = re.compile(r'name="csrf-token" content="([^"]+)"')
+
+
+def token_csrf(client):
+    """Lee el token CSRF de la sesión actual desde cualquier página (todas lo incluyen)."""
+    respuesta = client.get("/login")
+    return _META_CSRF.search(respuesta.text).group(1)
+
+
+def post(client, url, data=None, **kwargs):
+    datos = dict(data or {})
+    datos["csrf_token"] = token_csrf(client)
+    return client.post(url, data=datos, follow_redirects=False, **kwargs)
+
+
+def iniciar_sesion(client, username, clave=CLAVE):
+    return post(client, "/login", {"username": username, "password": clave})
