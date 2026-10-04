@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo %}
+{% block titulo %}Notificación individual{% endblock %}
+{% block contenido %}
+<h1>Notificación individual{% if ficha %} · Ficha #{{ ficha["id"] }}
+  <span class="badge {{ 'ok' if ficha['estado_ficha'] == 'Terminada' else 'pendiente' }}">{{ ficha["estado_ficha"] }}</span>{% endif %}</h1>
+<p class="sub">UPGD: {{ upgd["razon_social"] if upgd else "-" }}{% if solo_lectura %} · Solo lectura{% endif %}</p>
+{% if mensaje %}<p class="alerta exito">{{ mensaje }}</p>{% endif %}
+{% if errores %}<p class="alerta error">Revisa los campos marcados.{% if errores.get("general") %} {{ errores.get("general") }}{% endif %}</p>{% endif %}
+
+<div class="pestanas" data-tabs>
+  <button type="button" class="pestana activa" data-tab="basicos">1 · Datos básicos</button>
+  <button type="button" class="pestana" data-tab="complementarios">2 · Datos complementarios</button>
+  <button type="button" class="pestana" data-tab="laboratorios">3 · Laboratorios</button>
+</div>
+
+<form method="post" action="{{ '/fichas/%d' % ficha['id'] if ficha else '/fichas' }}" id="form-ficha">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <section data-panel="basicos" class="tarjeta">
+    <div class="campo{% if errores.get('codigo_evento') %} con-error{% endif %}">
+      <label for="codigo_evento">Evento de interés en salud pública *</label>
+      <select id="codigo_evento" name="codigo_evento"
+              hx-get="/fichas/campos" hx-target="#complementarios" hx-swap="innerHTML"
+              {% if solo_lectura %}disabled{% endif %}>
+        {% for e in eventos %}
+          <option value="{{ e['codigo'] }}" {% if e['codigo'] == codigo_evento %}selected{% endif %}>{{ e["codigo"] }} - {{ e["nombre"] }}</option>
+        {% endfor %}
+      </select>
+      {% if errores.get("codigo_evento") %}<p class="campo-error">{{ errores.get("codigo_evento") }}</p>{% endif %}
+    </div>
+    <div class="rejilla tres">
+      {% for c in campos_basicos %}
+        {{ campo(c, valores.get(c.key), errores.get(c.key), solo_lectura=solo_lectura, obligatorio=c.key in obligatorios) }}
+      {% endfor %}
+    </div>
+    {% if ficha and ficha["edad"] is not none %}
+      <p class="nota">Edad calculada: {{ ficha["edad"] }} {{ ficha["unidad_edad"] }}</p>
+    {% endif %}
+  </section>
+
+  <section data-panel="complementarios" class="tarjeta" hidden>
+    <div id="complementarios">{% include "_complementarios.html" %}</div>
+  </section>
+
+  {% if not solo_lectura %}
+  <div class="acciones">
+    <button class="btn primario">Guardar ficha</button>
+    {% if ficha %}<button class="btn exito" formaction="/fichas/{{ ficha['id'] }}/terminar">Terminar</button>{% endif %}
+  </div>
+  {% endif %}
+</form>
+
+<section data-panel="laboratorios" class="tarjeta" hidden>
+  {% if not ficha %}
+    <p class="nota">Guarda primero la ficha para poder registrar exámenes de laboratorio.</p>
+  {% else %}
+    <div id="laboratorios">{% include "_laboratorios.html" %}</div>
+  {% endif %}
+</section>
+
+{% if ficha and permisos.get("editar_notificaciones") %}
+<details class="zona-peligro">
+  <summary>Eliminar ficha</summary>
+  <p>Se borrará la ficha y sus resultados de laboratorio. Esta acción no se puede deshacer.</p>
+  <form method="post" action="/fichas/{{ ficha['id'] }}/eliminar">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn peligro">Sí, eliminar definitivamente</button>
+  </form>
+</details>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% from "_macros.html" import campo %}
+{% if campos_comp %}
+  <h2>Formulario específico{% if evento_nombre %}: {{ evento_nombre }}{% endif %}</h2>
+  <div class="rejilla dos">
+    {% for c in campos_comp %}
+      {{ campo(c, comp_valores.get(c.key), errores.get("comp__" ~ c.key), prefijo="comp__", solo_lectura=solo_lectura) }}
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="nota">Selecciona un evento en la pestaña 1.</p>
+{% endif %}
