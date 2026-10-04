@@ -238,9 +238,9 @@ def _seed_admin():
     with get_conn() as conn:
         row = conn.execute("SELECT COUNT(*) c FROM usuarios").fetchone()
     if row["c"] == 0:
+        # Solo el admin: cualquier otra cuenta la crea él desde "Usuarios". Una segunda cuenta
+        # sembrada con clave publicada la podría tomar quien entre primero.
         create_user("admin", "Admin123!", "Administrador SIVIGILA", rol="super_admin",
-                    debe_cambiar_password=True)
-        create_user("SIVIGILA", "sivigila2026", "Usuario SIVIGILA", rol="digitador",
                     debe_cambiar_password=True)
 
 

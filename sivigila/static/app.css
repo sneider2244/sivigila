@@ -72,6 +72,7 @@ input[type=text], input[type=password], input[type=date], input[type=search], se
 .badge.pendiente { background: var(--alerta); }
 .badge.inactivo { background: var(--peligro); }
 
+.tabla-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tabla { width: 100%; border-collapse: collapse; background: var(--tarjeta); }
 .tabla th, .tabla td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--borde); font-size: 14px; vertical-align: middle; }
 .tabla th { color: var(--suave); font-weight: 600; }
@@ -94,7 +95,15 @@ input[type=text], input[type=password], input[type=date], input[type=search], se
 
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
-  .sidebar { width: 100%; }
+  /* Barra lateral compacta: los enlaces en filas, sin ocupar media pantalla. */
+  .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; }
+  .marca { margin: 0 12px 0 0; font-size: 18px; }
+  .marca small { display: none; }
+  .nav { padding: 6px 10px; font-size: 14px; }
+  .usuario-box { margin-top: 0; flex-basis: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 6px 10px; }
+  .sidebar form { flex-basis: 100%; }
+  .btn-link { padding: 4px 10px; }
+  .tabla th, .tabla td { white-space: nowrap; }
   .contenido { padding: 16px; }
   .rejilla.dos, .rejilla.tres, .rejilla.cuatro { grid-template-columns: 1fr; }
   .barra-stat { grid-template-columns: 1fr; }

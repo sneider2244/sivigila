@@ -118,6 +118,12 @@ async def crear(request: Request, usuario=Depends(require_permiso("notificar_ind
     return redirigir(f"/fichas/{ficha_id}?guardada=1")
 
 
+@router.get("/fichas")
+def recargar_crear(request: Request):
+    # Tras un "Guardar" fallido la URL queda en /fichas; recargarla no debe dar 405.
+    return redirigir("/fichas/nueva")
+
+
 @router.get("/fichas/campos")
 def campos_complementarios(
     request: Request, codigo_evento: str = "",
@@ -161,6 +167,12 @@ async def _actualizar(request: Request, ficha_id: int, usuario, terminar: bool):
 async def guardar(request: Request, ficha_id: int,
                   usuario=Depends(require_permiso("editar_notificaciones"))):
     return await _actualizar(request, ficha_id, usuario, terminar=False)
+
+
+@router.get("/fichas/{ficha_id}/terminar")
+def recargar_terminar(request: Request, ficha_id: int):
+    # Tras un "Terminar" fallido la URL queda en .../terminar; recargarla no debe dar 405.
+    return redirigir(f"/fichas/{ficha_id}")
 
 
 @router.post("/fichas/{ficha_id}/terminar")

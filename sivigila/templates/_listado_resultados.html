@@ -1,5 +1,6 @@
 <p class="nota">{{ total }} ficha{{ "s" if total != 1 }}</p>
 {% if filas %}
+<div class="tabla-scroll">
 <table class="tabla">
   <thead><tr><th>Paciente</th><th>Documento</th><th>Evento</th><th>UPGD</th><th>Notificado</th><th>Estado</th><th></th></tr></thead>
   <tbody>
@@ -16,6 +17,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% if paginas > 1 %}
 <nav class="paginacion">
   {% set base = "q=" ~ (q | urlencode) ~ "&evento=" ~ (evento | urlencode) %}

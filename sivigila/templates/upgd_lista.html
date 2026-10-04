@@ -6,6 +6,7 @@
 {% if mensaje %}<p class="alerta exito">{{ mensaje }}</p>{% endif %}
 <p><a class="btn primario" href="/upgd/nueva">Nueva UPGD</a></p>
 {% if upgds %}
+<div class="tabla-scroll">
 <table class="tabla">
   <thead><tr><th>Razón social</th><th>NIT</th><th>Nivel</th><th>Sesión</th><th></th></tr></thead>
   <tbody>
@@ -29,6 +30,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p class="nota">No hay UPGD registradas todavía.</p>
 {% endif %}

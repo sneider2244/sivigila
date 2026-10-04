@@ -7,10 +7,8 @@ from tests.utils import CLAVE, crear_ficha, crear_upgd, crear_usuario
 
 def test_init_db_siembra_usuarios_con_cambio_obligatorio_y_eventos(db):
     admin = db.get_user_by_username("admin")
-    demo = db.get_user_by_username("SIVIGILA")
     assert admin["rol"] == "super_admin"
     assert admin["debe_cambiar_password"] == 1
-    assert demo["debe_cambiar_password"] == 1
     assert [e["codigo"] for e in db.list_eventos()] == ["100", "210", "205"]
 
 

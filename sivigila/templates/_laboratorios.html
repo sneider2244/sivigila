@@ -11,6 +11,7 @@
 {% endif %}
 <h3>Resultados registrados</h3>
 {% if labs %}
+<div class="tabla-scroll">
 <table class="tabla">
   <thead><tr><th>Prueba</th><th>Muestra</th><th>Agente</th><th>Resultado</th><th>Valor</th><th>Toma</th><th>Fecha resultado</th>{% if puede_labs %}<th></th>{% endif %}</tr></thead>
   <tbody>
@@ -32,6 +33,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p class="nota">Sin resultados registrados aún.</p>
 {% endif %}

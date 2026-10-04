@@ -37,9 +37,10 @@ uvicorn sivigila.main:app --reload
 Abre http://127.0.0.1:8000. La base `sivigila.db` se crea sola en la raíz del
 repo (no se versiona).
 
-Al crear una base nueva se siembran dos usuarios: `admin` (super
-administrador) y `SIVIGILA` (digitador). Las contraseñas iniciales están en
-`sivigila/db.py` (`_seed_admin`) y ambos deben cambiarla en su primer ingreso.
+Al crear una base nueva se siembra un solo usuario: `admin` (super
+administrador). Su contraseña inicial está en `sivigila/db.py` (`_seed_admin`)
+y debe cambiarla en su primer ingreso; los demás usuarios se crean desde
+**Usuarios**.
 
 | Variable | Para qué |
 |---|---|

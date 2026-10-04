@@ -5,6 +5,7 @@
 <p class="sub">Crea usuarios, asígnales un rol y personaliza sus permisos. Solo puedes gestionar usuarios de rango inferior al tuyo.</p>
 {% if mensaje %}<p class="alerta exito">{{ mensaje }}</p>{% endif %}
 {% if puede_crear %}<p><a class="btn primario" href="/usuarios/nuevo">Crear nuevo usuario</a></p>{% endif %}
+<div class="tabla-scroll">
 <table class="tabla">
   <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
   <tbody>
@@ -34,4 +35,5 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% endblock %}
