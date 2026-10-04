@@ -49,6 +49,7 @@ async def login(request: Request):
 def logout(request: Request):
     user_id = request.session.get("user_id")
     if user_id:
+        db.invalidar_sesiones(user_id)
         db.log_action(user_id, "LOGOUT")
     auth.cerrar_sesion(request)
     return redirigir("/login")
@@ -90,5 +91,7 @@ async def cambiar_password(request: Request, usuario=Depends(auth.usuario_actual
                       {"obligatorio": bool(usuario["debe_cambiar_password"]), "errores": errores})
 
     db.reset_password(usuario["id"], nueva, debe_cambiar=False)
+    # El cambio cierra las demás sesiones; esta sigue abierta con la versión nueva.
+    auth.iniciar_sesion(request, db.get_user_by_id(usuario["id"]))
     db.log_action(usuario["id"], "CAMBIA_PASSWORD")
     return redirigir(primera_pantalla(usuario))

@@ -149,8 +149,9 @@ async def _actualizar(request: Request, ficha_id: int, usuario, terminar: bool):
     if errores:
         return _render_ficha(request, ficha=ficha, valores=dict(form),
                              comp_valores=comp_de_form(form), errores=errores)
-    if terminar:
-        datos["estado_ficha"] = "Terminada"
+    # Guardar siempre deja la ficha "En proceso": una ficha terminada y luego modificada
+    # tiene que volver a pasar por la validación completa de "Terminar".
+    datos["estado_ficha"] = "Terminada" if terminar else "En proceso"
     db.update_notificacion(ficha_id, datos)
     db.log_action(usuario["id"], "TERMINA_FICHA" if terminar else "GUARDA_FICHA", f"id={ficha_id}")
     return redirigir(f"/fichas/{ficha_id}?{'terminada' if terminar else 'guardada'}=1")

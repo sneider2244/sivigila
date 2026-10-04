@@ -1998,7 +1998,7 @@ def test_error_500_no_expone_ni_registra_el_detalle(db, caplog):
 
     @app.get("/explota")
     def explota():
-        raise RuntimeError("Paciente Ana Pérez CC 1032456789")
+        raise RuntimeError("dato sensible 1032456789")  # datos sintéticos
 
     with TestClient(app, raise_server_exceptions=False) as c:
         with caplog.at_level(logging.ERROR, logger="sivigila"):

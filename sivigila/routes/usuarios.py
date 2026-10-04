@@ -20,8 +20,20 @@ def _objetivo(actor, user_id: int):
     return objetivo
 
 
-def _permisos_de_form(form) -> dict:
-    return {clave: form.get(f"perm_{clave}") == "1" for clave in db.PERMISOS_LABELS}
+def _permisos_de_form(form, actor, actuales: dict) -> dict:
+    """
+    Permisos pedidos en el formulario, limitados a los que tiene el actor: no puede dar
+    un permiso que no tiene, ni quitarlo (ese conserva el valor actual del usuario).
+    El super_admin no tiene límite.
+    """
+    permisos = {}
+    for clave in db.PERMISOS_LABELS:
+        pedido = form.get(f"perm_{clave}") == "1"
+        if actor["rol"] == "super_admin" or db.tiene_permiso(actor, clave):
+            permisos[clave] = pedido
+        else:
+            permisos[clave] = bool(actuales.get(clave, False))
+    return permisos
 
 
 def _render_form(request, actor, objetivo=None, valores=None, permisos=None, errores=None):
@@ -83,7 +95,7 @@ async def crear(request: Request, usuario=Depends(permiso)):
     nombre = str(form.get("nombre_completo", "")).strip()
     password = str(form.get("password", ""))
     rol = str(form.get("rol", ""))
-    permisos = _permisos_de_form(form)
+    permisos = _permisos_de_form(form, usuario, {})
 
     errores = {}
     if not username:
@@ -120,7 +132,7 @@ async def editar(request: Request, user_id: int, usuario=Depends(permiso)):
     form = await request.form()
     nombre = str(form.get("nombre_completo", "")).strip()
     rol = str(form.get("rol", ""))
-    permisos = _permisos_de_form(form)
+    permisos = _permisos_de_form(form, usuario, db.get_permisos(objetivo))
 
     errores = {}
     if not nombre:

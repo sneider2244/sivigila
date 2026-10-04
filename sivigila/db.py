@@ -9,6 +9,7 @@ import json
 import os
 import secrets
 import sqlite3
+import unicodedata
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -24,10 +25,19 @@ def _db_path() -> str:
 # Conexión
 # ---------------------------------------------------------------------------
 
+def normalizar(texto):
+    """Minúsculas y sin tildes, para buscar 'perez' y encontrar 'PÉREZ'."""
+    if texto is None:
+        return None
+    descompuesto = unicodedata.normalize("NFD", str(texto))
+    return "".join(c for c in descompuesto if unicodedata.category(c) != "Mn").casefold()
+
+
 @contextmanager
 def get_conn():
     conn = sqlite3.connect(_db_path())
     conn.row_factory = sqlite3.Row
+    conn.create_function("normalizar", 1, normalizar, deterministic=True)
     conn.execute("PRAGMA foreign_keys = ON")
     try:
         yield conn
@@ -52,6 +62,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     permisos              TEXT NOT NULL DEFAULT '{}',   -- JSON de permisos granulares
     activo                INTEGER NOT NULL DEFAULT 1,
     debe_cambiar_password INTEGER NOT NULL DEFAULT 0,
+    sesion_version        INTEGER NOT NULL DEFAULT 0,
     creado_en             TEXT NOT NULL,
     creado_por            INTEGER
 );
@@ -183,6 +194,11 @@ def _migrar(conn):
         conn.execute(
             "ALTER TABLE usuarios ADD COLUMN debe_cambiar_password INTEGER NOT NULL DEFAULT 0"
         )
+        # Bases de la versión de escritorio: sus claves (incluidas las sembradas, que están
+        # publicadas en el README y en el historial de git) se deben cambiar al primer ingreso.
+        conn.execute("UPDATE usuarios SET debe_cambiar_password = 1")
+    if "sesion_version" not in columnas:
+        conn.execute("ALTER TABLE usuarios ADD COLUMN sesion_version INTEGER NOT NULL DEFAULT 0")
 
 
 def init_db():
@@ -365,12 +381,20 @@ def set_user_active(user_id, activo: bool):
 
 
 def reset_password(user_id, new_password, debe_cambiar=True):
+    """Cambia la clave y cierra todas las sesiones abiertas del usuario."""
     pw_hash, salt = _hash_password(new_password)
     with get_conn() as conn:
         conn.execute(
-            "UPDATE usuarios SET password_hash = ?, salt = ?, debe_cambiar_password = ? WHERE id = ?",
+            "UPDATE usuarios SET password_hash = ?, salt = ?, debe_cambiar_password = ?, "
+            "sesion_version = sesion_version + 1 WHERE id = ?",
             (pw_hash, salt, 1 if debe_cambiar else 0, user_id),
         )
+
+
+def invalidar_sesiones(user_id):
+    """Hace inválidas todas las cookies de sesión emitidas hasta ahora para el usuario."""
+    with get_conn() as conn:
+        conn.execute("UPDATE usuarios SET sesion_version = sesion_version + 1 WHERE id = ?", (user_id,))
 
 
 def log_action(usuario_id, accion, detalle=""):
@@ -517,9 +541,13 @@ def get_notificacion(notificacion_id):
 def _filtro_notificaciones(filtro_texto, codigo_evento):
     sql, params = " WHERE 1=1", []
     if filtro_texto:
-        sql += """ AND (n.primer_nombre LIKE ? OR n.primer_apellido LIKE ?
-                        OR n.numero_id LIKE ? OR n.codigo_ficha LIKE ?)"""
-        like = f"%{filtro_texto}%"
+        # Sin distinguir mayúsculas ni tildes; '%' y '_' escritos por el usuario son texto.
+        sql += r""" AND (normalizar(n.primer_nombre) LIKE ? ESCAPE '\'
+                        OR normalizar(n.primer_apellido) LIKE ? ESCAPE '\'
+                        OR normalizar(n.numero_id) LIKE ? ESCAPE '\'
+                        OR normalizar(n.codigo_ficha) LIKE ? ESCAPE '\')"""
+        texto = normalizar(filtro_texto).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
+        like = f"%{texto}%"
         params += [like, like, like, like]
     if codigo_evento and codigo_evento != "Todos":
         sql += " AND n.codigo_evento = ?"

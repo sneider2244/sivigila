@@ -101,6 +101,7 @@ async def verificar_csrf(request: Request):
 def iniciar_sesion(request: Request, usuario):
     request.session.clear()  # evita reutilizar una sesión previa (fijación de sesión)
     request.session["user_id"] = usuario["id"]
+    request.session["sesion_version"] = usuario["sesion_version"]
     request.session["csrf_token"] = secrets.token_urlsafe(32)
 
 
@@ -111,10 +112,14 @@ def cerrar_sesion(request: Request):
 # --- Usuario actual y permisos -----------------------------------------------
 
 def usuario_actual(request: Request):
-    """Relee el usuario en cada petición: si lo desactivan, pierde la sesión de inmediato."""
+    """
+    Relee el usuario en cada petición: si lo desactivan, pierde la sesión de inmediato.
+    La versión de sesión invalida cookies viejas tras logout o cambio de clave.
+    """
     user_id = request.session.get("user_id")
     usuario = db.get_user_by_id(user_id) if user_id else None
-    if usuario is None or not usuario["activo"]:
+    if (usuario is None or not usuario["activo"]
+            or request.session.get("sesion_version") != usuario["sesion_version"]):
         request.session.clear()
         raise NoAutenticado()
     request.state.usuario = usuario
