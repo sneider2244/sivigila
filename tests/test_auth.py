@@ -1,3 +1,7 @@
+import logging
+
+from fastapi.testclient import TestClient
+
 from tests.utils import CLAVE, crear_usuario, iniciar_sesion, post, token_csrf
 
 
@@ -80,3 +84,83 @@ def test_usuario_sin_ninguna_pantalla_va_a_sin_acceso(client, db):
     pagina = client.get("/sin-acceso")
     assert pagina.status_code == 200
     assert "ninguna sección" in pagina.text
+
+
+
+
+def test_bloqueo_tras_cinco_intentos_y_desbloqueo(client, db, monkeypatch):
+    from sivigila import auth
+
+    crear_usuario(db, "digi")
+    reloj = [1000.0]
+    monkeypatch.setattr(auth, "_ahora", lambda: reloj[0])
+    for _ in range(5):
+        iniciar_sesion(client, "digi", "mala")
+    r = iniciar_sesion(client, "digi")  # clave correcta, pero bloqueado
+    assert r.status_code == 429
+    assert "Espera 10 minutos" in r.text
+    reloj[0] += 601
+    assert iniciar_sesion(client, "digi").status_code == 303
+
+
+def test_usuario_sembrado_debe_cambiar_password(client):
+    r = iniciar_sesion(client, "admin", "Admin123!")
+    assert r.headers["location"] == "/cambiar-password"
+    r = client.get("/sin-acceso", follow_redirects=False)
+    assert r.status_code == 303
+    assert r.headers["location"] == "/cambiar-password"
+
+
+def test_cambiar_password_valida_campos(client, db):
+    crear_usuario(db, "digi")
+    iniciar_sesion(client, "digi")
+    r = post(client, "/cambiar-password",
+             {"actual": "mala", "nueva": "abc", "confirmacion": "xyz"})
+    assert r.status_code == 200
+    assert "La contraseña actual no es correcta." in r.text
+    assert "Debe tener al menos 6 caracteres." in r.text
+    assert "No coincide con la nueva contraseña." in r.text
+
+
+def test_cambiar_password_correcto(client, db):
+    iniciar_sesion(client, "admin", "Admin123!")
+    r = post(client, "/cambiar-password",
+             {"actual": "Admin123!", "nueva": "NuevaClave9", "confirmacion": "NuevaClave9"})
+    assert r.status_code == 303
+    assert r.headers["location"] == "/"
+    assert db.get_user_by_username("admin")["debe_cambiar_password"] == 0
+    post(client, "/logout")
+    assert iniciar_sesion(client, "admin", "NuevaClave9").status_code == 303
+
+
+def test_usuario_desactivado_pierde_la_sesion(client, db):
+    usuario = crear_usuario(db, "digi")
+    iniciar_sesion(client, "digi")
+    db.set_user_active(usuario["id"], False)
+    r = client.get("/sin-acceso", follow_redirects=False)
+    assert r.headers["location"] == "/login"
+
+
+def test_pagina_404(client):
+    r = client.get("/no-existe")
+    assert r.status_code == 404
+    assert "No encontrado" in r.text
+
+
+def test_error_500_no_expone_ni_registra_el_detalle(db, caplog):
+    from sivigila.main import create_app
+
+    app = create_app()
+
+    @app.get("/explota")
+    def explota():
+        raise RuntimeError("Paciente Ana Pérez CC 1032456789")
+
+    with TestClient(app, raise_server_exceptions=False) as c:
+        with caplog.at_level(logging.ERROR, logger="sivigila"):
+            r = c.get("/explota")
+    assert r.status_code == 500
+    assert "Ocurrió un error inesperado" in r.text
+    assert "1032456789" not in r.text
+    assert "RuntimeError" in caplog.text
+    assert "1032456789" not in caplog.text

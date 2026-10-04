@@ -61,3 +61,34 @@ def sin_acceso(request: Request, usuario=Depends(auth.usuario_actual)):
         "mensaje": "Tu usuario no tiene ninguna sección habilitada. "
                    "Pide a un administrador que te asigne permisos.",
     })
+
+
+@router.get("/cambiar-password")
+def cambiar_password_form(request: Request, usuario=Depends(auth.usuario_actual)):
+    return render(request, "cambiar_password.html",
+                  {"obligatorio": bool(usuario["debe_cambiar_password"]), "errores": {}})
+
+
+@router.post("/cambiar-password")
+async def cambiar_password(request: Request, usuario=Depends(auth.usuario_actual)):
+    form = await request.form()
+    actual = str(form.get("actual", ""))
+    nueva = str(form.get("nueva", ""))
+    confirmacion = str(form.get("confirmacion", ""))
+
+    errores = {}
+    if not db.verify_password(actual, usuario["password_hash"], usuario["salt"]):
+        errores["actual"] = "La contraseña actual no es correcta."
+    if len(nueva) < auth.MIN_PASSWORD:
+        errores["nueva"] = f"Debe tener al menos {auth.MIN_PASSWORD} caracteres."
+    elif nueva == actual:
+        errores["nueva"] = "Debe ser distinta de la actual."
+    if nueva != confirmacion:
+        errores["confirmacion"] = "No coincide con la nueva contraseña."
+    if errores:
+        return render(request, "cambiar_password.html",
+                      {"obligatorio": bool(usuario["debe_cambiar_password"]), "errores": errores})
+
+    db.reset_password(usuario["id"], nueva, debe_cambiar=False)
+    db.log_action(usuario["id"], "CAMBIA_PASSWORD")
+    return redirigir(primera_pantalla(usuario))
