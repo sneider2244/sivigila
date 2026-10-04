@@ -22,25 +22,65 @@ laboratorio → terminar), construida en **Python** con:
 ## 2. Instalación
 
 ```powershell
+git clone https://github.com/sneider2244/sivigila.git
+cd sivigila
+```
+
+Windows (PowerShell):
+
+```powershell
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
 ```
 
+Si PowerShell no deja activar el entorno, ejecuta una vez
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+Linux / macOS:
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
 ## 3. Ejecución local
 
+Con el entorno virtual activado:
+
 ```powershell
-$env:SIVIGILA_SECRET_KEY = "<una cadena larga y aleatoria>"   # opcional en local; obligatoria fuera de tu máquina
 uvicorn sivigila.main:app --reload
 ```
 
-Abre http://127.0.0.1:8000. La base `sivigila.db` se crea sola en la raíz del
-repo (no se versiona).
+Abre http://127.0.0.1:8000 e ingresa con uno de estos usuarios:
 
-Al crear una base nueva se siembra un solo usuario: `admin` (super
-administrador). Su contraseña inicial está en `sivigila/db.py` (`_seed_admin`)
-y debe cambiarla en su primer ingreso; los demás usuarios se crean desde
-**Usuarios**.
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `Admin123!` | Super administrador |
+| `SIVIGILA` | `sivigila2026` | Digitador |
+
+Los dos piden cambiar la contraseña en el primer ingreso. Los demás usuarios
+se crean desde **Usuarios**.
+
+### La base de datos
+
+El repo **incluye** `sivigila.db`, una base SQLite de prueba que trae esos dos
+usuarios, una UPGD de ejemplo y ninguna ficha. Ojo: al usarla la modificas, y
+`git status` la va a mostrar como cambiada; no commitees esos cambios.
+
+Para empezar con una base vacía, apunta `SIVIGILA_DB_PATH` a un archivo que no
+exista. La app la crea al arrancar y siembra solo el usuario `admin` con
+`Admin123!`:
+
+```powershell
+$env:SIVIGILA_DB_PATH = "mi-base.db"     # Linux/macOS: export SIVIGILA_DB_PATH=mi-base.db
+uvicorn sivigila.main:app --reload
+```
+
+### Variables de entorno
+
+Ninguna es obligatoria para correrla en tu máquina.
 
 | Variable | Para qué |
 |---|---|
@@ -125,8 +165,11 @@ eventos solo se siembran en una base nueva.
 
 - Las contraseñas se guardan con `hashlib.pbkdf2_hmac` (200.000 iteraciones,
   sal por usuario).
-- `sivigila.db` contiene datos de pacientes (Ley 1581): no la subas a git
-  (ya está en `.gitignore`) ni la compartas. Las versiones anteriores del
-  repo sí la versionaron; ver el historial de git antes de publicarlo.
+- La `sivigila.db` del repo es solo de prueba y no tiene fichas. Una base con
+  fichas reales contiene datos de pacientes (Ley 1581): nunca se commitea ni se
+  comparte. Si vas a registrar datos reales, usa `SIVIGILA_DB_PATH` con una
+  ruta fuera del repo.
+- Las contraseñas de los usuarios de prueba son públicas: fuera de tu máquina,
+  arranca con una base vacía y define `SIVIGILA_SECRET_KEY`.
 - Los logs del servidor no incluyen datos de pacientes: solo ruta, método y
   tipo de error.
