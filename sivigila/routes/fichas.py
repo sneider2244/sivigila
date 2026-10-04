@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from .. import db
 from ..auth import require_permiso
 from ..catalogos import CAMPOS_BASICOS, CAMPOS_LAB, OBLIGATORIOS_GUARDAR
-from ..validacion import comp_de_form, validar_ficha
+from ..validacion import comp_de_form, validar_ficha, validar_laboratorio
 from ..web import redirigir, render, upgd_activa
 
 router = APIRouter()
@@ -175,3 +175,30 @@ def eliminar(request: Request, ficha_id: int,
     db.delete_notificacion(ficha_id)
     db.log_action(usuario["id"], "ELIMINA_FICHA", f"id={ficha_id}")
     return redirigir("/listado")
+
+
+@router.post("/fichas/{ficha_id}/laboratorios")
+async def agregar_laboratorio(request: Request, ficha_id: int,
+                              usuario=Depends(require_permiso("gestionar_laboratorios"))):
+    ficha = _ficha_o_404(ficha_id)
+    form = await request.form()
+    datos, errores = validar_laboratorio(form, date.today())
+    if errores:
+        return render(request, "_laboratorios.html",
+                      _contexto_labs(request, ficha, valores=dict(form), errores=errores),
+                      status_code=422)
+    db.add_laboratorio(ficha_id, datos)
+    db.log_action(usuario["id"], "AGREGA_LABORATORIO", f"ficha={ficha_id}")
+    return render(request, "_laboratorios.html", _contexto_labs(request, ficha))
+
+
+@router.post("/fichas/{ficha_id}/laboratorios/{lab_id}/eliminar")
+def eliminar_laboratorio(request: Request, ficha_id: int, lab_id: int,
+                         usuario=Depends(require_permiso("gestionar_laboratorios"))):
+    ficha = _ficha_o_404(ficha_id)
+    lab = db.get_laboratorio(lab_id)
+    if lab is None or lab["notificacion_id"] != ficha_id:
+        raise HTTPException(status_code=404)
+    db.delete_laboratorio(lab_id)
+    db.log_action(usuario["id"], "ELIMINA_LABORATORIO", f"ficha={ficha_id} lab={lab_id}")
+    return render(request, "_laboratorios.html", _contexto_labs(request, ficha))
